@@ -25,6 +25,7 @@
   "dependencies": {
     "aws-sdk": "^2.192.0",
     "colors": "^1.1.2",
+    "fast-glob": "^2.1.0",
     "md5-file": "^3.2.3",
     "mime-types": "^2.1.17",
     "path": "^0.12.7",

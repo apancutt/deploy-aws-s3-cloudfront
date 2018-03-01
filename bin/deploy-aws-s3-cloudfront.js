@@ -8,6 +8,7 @@
 
 const aws = require('aws-sdk');
 const colors = require('colors/safe');
+const fastGlob = require('fast-glob');
 const fs = require('fs');
 const md5File = require('md5-file')
 const mimeTypes = require('mime-types')
@@ -38,6 +39,16 @@ const argv = yargs
     demand: true,
     describe: 'Path to remote directory to sync to',
     default: '/',
+  })
+  .option('exclude', {
+    type: 'array',
+    describe: 'Patterns to exclude from deployment',
+    default: [],
+  })
+  .option('delete', {
+    type: 'boolean',
+    describe: 'Delete files from AWS S3 that do not exist locally',
+    default: false,
   })
   .option('profile', {
     type: 'string',
@@ -140,21 +151,23 @@ function fetch() {
     function local() {
       return new Promise((resolve, reject) => {
 
-        const results = {};
-
-        function fetch(dir) {
-          return fs.statSync(dir).isDirectory()
-            ? Array.prototype.concat(...fs.readdirSync(dir).map(file => fetch(path.join(dir, file))))
-            : dir;
-        }
-
         console.log(colors.debug('Fetching local objects in ' + colors.bold(argv.source) + '...'));
 
-        fetch(argv.source).forEach((result) => {
-          results[result.replace(argv.source, '')] = md5File.sync(result);
-        });
+        fastGlob('**', {
+          cwd: argv.source,
+          dot: true,
+          ignore: argv.exclude,
+        }).then((objects) => {
 
-        resolve(results);
+          const results = {};
+
+          objects.forEach((object) => {
+            results[object] = md5File.sync(argv.source + object);
+          });
+
+          resolve(results);
+
+        });
 
       });
     }
@@ -244,12 +257,14 @@ function changes(fetched) {
       }
     });
 
-    Object.keys(fetched.remote).forEach((key) => {
-      if (!fetched.local.hasOwnProperty(key)) {
-        results.deleted.push(key);
-        console.log(colors.red.bold('D ') + key);
-      }
-    });
+    if (argv.delete) {
+      Object.keys(fetched.remote).forEach((key) => {
+        if (!fetched.local.hasOwnProperty(key)) {
+          results.deleted.push(key);
+          console.log(colors.red.bold('D ') + key);
+        }
+      });
+    }
 
     resolve(results);
 

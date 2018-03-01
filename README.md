@@ -28,6 +28,9 @@ If you are relying on credentials stored in `~/.aws/credentials` you can use the
                                                   [string] [required] [default: "."]
       --destination      Path to remote directory to sync to
                                                   [string] [required] [default: "/"]
+      --exclude          Patterns to exclude from deployment   [array] [default: []]
+      --delete           Delete files from AWS S3 that do not exist locally
+                                                          [boolean] [default: false]
       --profile          AWS profile to use as named in ~/.aws/credentials  [string]
       --non-interactive  Do not prompt for confirmation   [boolean] [default: false]
 
