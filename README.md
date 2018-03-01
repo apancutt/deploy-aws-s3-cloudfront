@@ -67,7 +67,7 @@ If you prefer to always run a build before deployment:
       ...
       "scripts": {
         ...
-        "deploy": "npm run build && deploy-aws-s3-cloudfront --source ./build/ [options]"
+        "deploy": "npm run build && deploy-aws-s3-cloudfront --source=./build/ [options]"
       }
     }
 
