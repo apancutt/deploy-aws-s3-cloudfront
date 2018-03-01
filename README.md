@@ -55,7 +55,7 @@ Set the `--source` option to `/.build/`:
       ...
       "scripts": {
         ...
-        "deploy": "deploy-aws-s3-cloudfront --source ./build/ [options]"
+        "deploy": "deploy-aws-s3-cloudfront --source=./build/ [options]"
       }
     }
 
