@@ -1,0 +1,17 @@
+# Mac OS
+.DS_Store
+
+# Eclipse IDE
+/.buildpath
+/.project
+/.settings/
+
+# IntelliJ Idea IDE
+/.idea/
+/*.iml
+
+# Netbeans IDE
+/nbproject/
+
+/node_modules
+/package-lock.json

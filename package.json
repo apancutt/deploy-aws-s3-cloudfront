@@ -1,0 +1,35 @@
+{
+  "name": "deploy-aws-s3-cloudfront",
+  "version": "0.1.0",
+  "description": "Syncs a local directory to an AWS S3 bucket, optionally invalidating affected CloudFront paths.",
+  "keywords": [
+    "aws",
+    "s3",
+    "cloudfront",
+    "deploy"
+  ],
+  "homepage": "https://github.com/apancutt/deploy-aws-s3-cloudfront#readme",
+  "bugs": {
+    "url": "https://github.com/apancutt/deploy-aws-s3-cloudfront/issues"
+  },
+  "author": "Adam Pancutt <adam@pancutt.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/apancutt/deploy-aws-s3-cloudfront.git"
+  },
+  "bin": "./bin/deploy-aws-s3-cloudfront.js",
+  "files": [
+    "bin"
+  ],
+  "dependencies": {
+    "aws-sdk": "^2.192.0",
+    "colors": "^1.1.2",
+    "md5-file": "^3.2.3",
+    "mime-types": "^2.1.17",
+    "path": "^0.12.7",
+    "pretty-bytes": "^4.0.2",
+    "prompt-confirm": "^1.2.0",
+    "yargs": "^11.0.0"
+  }
+}
