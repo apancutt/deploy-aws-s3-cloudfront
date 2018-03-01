@@ -191,7 +191,7 @@ function fetch() {
             }
 
             data.Contents.forEach((content) => {
-              results[content.Key] = content.ETag.replace(/"/g, '');
+              results[content.Key.replace(argv.destination, '')] = content.ETag.replace(/"/g, '');
             });
 
             if (data.IsTruncated) {
