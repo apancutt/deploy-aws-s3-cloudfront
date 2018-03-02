@@ -18,6 +18,9 @@ const promptConfirm = require('prompt-confirm');
 const querystring = require('querystring');
 const yargs = require('yargs');
 
+console.log(querystring.escape('//').replace('%2F', '/'));
+process.exit();
+
 const argv = yargs
   .usage('$0 [options]', 'Syncs a local directory to an AWS S3 bucket, optionally invalidating affected CloudFront paths.')
   .option('bucket', {
@@ -293,9 +296,9 @@ function deploy(uploads, deletes) {
 
           uploads.forEach((key) => {
 
-            const path = argv.source + key;
-            const stats = fs.statSync(path);
-            const stream = fs.createReadStream(path);
+            const file = argv.source + key;
+            const stats = fs.statSync(file);
+            const stream = fs.createReadStream(file);
 
             stream.on('error', function(err) {
               throw err;
@@ -304,7 +307,7 @@ function deploy(uploads, deletes) {
             let params = Object.assign({
               Body: stream,
               Key: argv.destination + key,
-              ContentType: mimeTypes.lookup(path) || 'application/octet-stream',
+              ContentType: mimeTypes.lookup(file) || 'application/octet-stream',
               ContentLength: stats.size,
             }, defaults);
 
@@ -387,16 +390,16 @@ function invalidate(invalidations) {
   return new Promise((resolve, reject) => {
 
     const invalidated = [];
-    let path;
+    let url;
 
     if (!argv.distribution) {
       resolve(invalidated);
     }
 
     invalidations.forEach((key) => {
-      path = querystring.escape('/' + key);
-      invalidated.push(path);
-      console.log(colors.info('Invalidating ' + colors.bold(path) + ' on CloudFront distribution ' + colors.bold(argv.distribution) + '...'));
+      url = querystring.escape('/' + key).replace('%2F', '/');
+      invalidated.push(url);
+      console.log(colors.info('Invalidating ' + colors.bold(url) + ' on CloudFront distribution ' + colors.bold(argv.distribution) + '...'));
     });
 
     const params = {
