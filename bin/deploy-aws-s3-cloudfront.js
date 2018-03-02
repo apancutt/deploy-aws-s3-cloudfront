@@ -18,9 +18,6 @@ const promptConfirm = require('prompt-confirm');
 const querystring = require('querystring');
 const yargs = require('yargs');
 
-console.log(querystring.escape('//').replace('%2F', '/'));
-process.exit();
-
 const argv = yargs
   .usage('$0 [options]', 'Syncs a local directory to an AWS S3 bucket, optionally invalidating affected CloudFront paths.')
   .option('bucket', {
@@ -397,7 +394,7 @@ function invalidate(invalidations) {
     }
 
     invalidations.forEach((key) => {
-      url = querystring.escape('/' + key).replace('%2F', '/');
+      url = querystring.escape('/' + key).replace(/%2F/g, '/')
       invalidated.push(url);
       console.log(colors.info('Invalidating ' + colors.bold(url) + ' on CloudFront distribution ' + colors.bold(argv.distribution) + '...'));
     });
