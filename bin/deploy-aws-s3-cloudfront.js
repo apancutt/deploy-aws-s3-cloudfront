@@ -15,6 +15,7 @@ const mimeTypes = require('mime-types')
 const path = require('path');
 const prettyBytes = require('pretty-bytes');
 const promptConfirm = require('prompt-confirm');
+const querystring = require('querystring');
 const yargs = require('yargs');
 
 const argv = yargs
@@ -389,7 +390,7 @@ function invalidate(invalidations) {
     let path;
 
     invalidations.forEach((key) => {
-      path = '/' + key;
+      path = querystring.escape('/' + key);
       invalidated.push(path);
       console.log(colors.info('Invalidating ' + colors.bold(path) + ' on CloudFront distribution ' + colors.bold(argv.distribution) + '...'));
     });
