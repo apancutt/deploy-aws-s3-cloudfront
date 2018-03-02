@@ -287,6 +287,10 @@ function deploy(uploads, deletes) {
 
         try {
 
+          if (!uploads.length) {
+            resolve(uploaded);
+          }
+
           uploads.forEach((key) => {
 
             const path = argv.source + key;
@@ -330,16 +334,16 @@ function deploy(uploads, deletes) {
 
         const deleted = [];
 
-        if (!deletes.length) {
-          return resolve(deleted);
-        }
-
         const params = {
           Bucket: argv.bucket,
           Delete: {
             Objects: [],
           },
         };
+
+        if (!deletes.length) {
+          return resolve(deleted);
+        }
 
         deletes.forEach((key) => {
           key = argv.destination + key;
@@ -382,12 +386,12 @@ function deploy(uploads, deletes) {
 function invalidate(invalidations) {
   return new Promise((resolve, reject) => {
 
-    if (!argv.distribution) {
-      resolve([]);
-    }
-
     const invalidated = [];
     let path;
+
+    if (!argv.distribution) {
+      resolve(invalidated);
+    }
 
     invalidations.forEach((key) => {
       path = querystring.escape('/' + key);
