@@ -333,6 +333,7 @@ function deploy(uploads, deletes) {
       return new Promise((resolve, reject) => {
 
         const deleted = [];
+        const remaining = deletes.slice(0);
 
         const params = {
           Bucket: argv.bucket,
@@ -345,16 +346,24 @@ function deploy(uploads, deletes) {
           return resolve(deleted);
         }
 
-        deletes.forEach((key) => {
-          key = argv.destination + key;
-          console.log(colors.warn('Deleting ' + colors.bold(key) + ' from ' + colors.bold(argv.bucket) + '...'));
-          params.Delete.Objects.push({Key: key});
-          deleted.push(key);
-        });
+        while (remaining.length) {
 
-        s3.deleteObjects(params, function(err, data) {
-          err ? reject(err) : resolve(deleted);
-        });
+          remaining.splice(0, 1000).forEach((key) => {
+            key = argv.destination + key;
+            console.log(colors.warn('Deleting ' + colors.bold(key) + ' from ' + colors.bold(argv.bucket) + '...'));
+            params.Delete.Objects.push({Key: key});
+            deleted.push(key);
+          });
+
+          s3.deleteObjects(params, function(err, data) {
+            if (err) {
+              reject(err);
+            } else if (!remaining.length) {
+              resolve(deleted);
+            }
+          });
+
+        }
 
       });
     }
@@ -387,32 +396,41 @@ function invalidate(invalidations) {
   return new Promise((resolve, reject) => {
 
     const invalidated = [];
+    const remaining = invalidations.slice(0);
     let url;
 
-    if (!argv.distribution) {
+    if (!argv.distribution || !invalidations.length) {
       resolve(invalidated);
     }
 
-    invalidations.forEach((key) => {
-      url = querystring.escape('/' + key).replace(/%2F/g, '/')
-      invalidated.push(url);
-      console.log(colors.info('Invalidating ' + colors.bold(url) + ' on CloudFront distribution ' + colors.bold(argv.distribution) + '...'));
-    });
+    while (remaining.length) {
 
-    const params = {
-      DistributionId: argv.distribution,
-      InvalidationBatch: {
-        CallerReference: Math.floor(Date.now() / 1000).toString(),
-        Paths: {
-          Quantity: invalidated.length,
-          Items: invalidated,
+      remaining.splice(0, 3000).forEach((key) => {
+        url = querystring.escape('/' + key).replace(/%2F/g, '/')
+        invalidated.push(url);
+        console.log(colors.info('Invalidating ' + colors.bold(url) + ' on CloudFront distribution ' + colors.bold(argv.distribution) + '...'));
+      });
+
+      const params = {
+        DistributionId: argv.distribution,
+        InvalidationBatch: {
+          CallerReference: Math.floor(Date.now() / 1000).toString(),
+          Paths: {
+            Quantity: invalidated.length,
+            Items: invalidated,
+          },
         },
-      },
-    };
+      };
 
-    cloudfront.createInvalidation(params, (err, data) => {
-      err ? reject(err) : resolve(invalidated);
-    });
+      cloudfront.createInvalidation(params, (err, data) => {
+        if (err) {
+          reject(err);
+        } else if (!remaining.length) {
+          resolve(invalidated);
+        }
+      });
+
+    }
 
   });
 }
