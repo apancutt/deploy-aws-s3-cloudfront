@@ -76,6 +76,10 @@ if (argv.destination) {
   argv.destination += '/';
 }
 
+if (argv.invalidationPath) {
+  argv.invalidationPath = argv.invalidationPath.replace(/^\//g, '');
+}
+
 if (argv.profile) {
   aws.config.credentials = new aws.SharedIniFileCredentials({
     profile: argv.profile,
