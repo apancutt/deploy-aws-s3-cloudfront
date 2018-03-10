@@ -51,6 +51,10 @@ const argv = yargs
     describe: 'Delete files from AWS S3 that do not exist locally',
     default: false,
   })
+  .option('invalidation-path', {
+    type: 'string',
+    describe: 'Set the invalidation path instead of automatically detecting objects to invalidate',
+  })
   .option('profile', {
     type: 'string',
     describe: 'AWS profile to use as named in ~/.aws/credentials',
@@ -398,8 +402,14 @@ function invalidate(invalidations) {
   return new Promise((resolve, reject) => {
 
     const invalidated = [];
-    const remaining = invalidations.slice(0);
+    let remaining;
     let url;
+
+    if (argv.invalidationPath) {
+      remaining = [argv.invalidationPath];
+    } else {
+      remaining = invalidations.slice(0);
+    }
 
     const params = {
       DistributionId: argv.distribution,

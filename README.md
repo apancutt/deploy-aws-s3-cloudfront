@@ -20,19 +20,21 @@ If you are relying on credentials stored in `~/.aws/credentials` you can use the
     CloudFront paths.
     
     Options:
-      --help             Show help                                         [boolean]
-      --version          Show version number                               [boolean]
-      --bucket           AWS S3 bucket name to deploy to         [string] [required]
-      --distribution     AWS CloudFront distribution ID to invalidate       [string]
-      --source           Path to local directory to sync from
+      --help               Show help                                       [boolean]
+      --version            Show version number                             [boolean]
+      --bucket             AWS S3 bucket name to deploy to       [string] [required]
+      --distribution       AWS CloudFront distribution ID to invalidate     [string]
+      --source             Path to local directory to sync from
                                                   [string] [required] [default: "."]
-      --destination      Path to remote directory to sync to
+      --destination        Path to remote directory to sync to
                                                   [string] [required] [default: "/"]
-      --exclude          Patterns to exclude from deployment   [array] [default: []]
-      --delete           Delete files from AWS S3 that do not exist locally
+      --exclude            Patterns to exclude from deployment [array] [default: []]
+      --delete             Delete files from AWS S3 that do not exist locally
                                                           [boolean] [default: false]
-      --profile          AWS profile to use as named in ~/.aws/credentials  [string]
-      --non-interactive  Do not prompt for confirmation   [boolean] [default: false]
+      --invalidation-path  Set the invalidation path instead of automatically
+                           detecting objects to invalidate                  [string]
+      --profile            AWS profile to use as named in ~/.aws/credentials[string]
+      --non-interactive    Do not prompt for confirmation [boolean] [default: false]
 
 ### Installing a `run-script` alias (optional)
 
