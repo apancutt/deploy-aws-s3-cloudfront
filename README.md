@@ -68,7 +68,7 @@ Run `npm run build` to build then `npm run deploy` to deploy.
 
 If you need to pass user-level options that you don't want committed into `package.json`, the you can provide these options at call-time, e.g. `npm run deploy -- --profile <profile>`.
 
-## Configuration for `create-react-app` projects
+## Configuration for [create-react-app](https://github.com/facebook/create-react-app) projects
 
 Set the `--source` option to `/.build/`:
 
@@ -100,7 +100,7 @@ If you prefer to always run a build before deployment:
 
   This package will instead perform a checksum comparison to minimise the deployment payload. The MD5 checksum will be computed against local files then compared against the ETag of the corresponding remote objects.
 
-* [react-deploy-s3](https://www.npmjs.com/package/react-deploy-s3) (NPM package)
+* [react-deploy-s3](https://www.npmjs.com/package/react-deploy-s3)
 
   For React apps, the `react-deploy-s3` provides similar behaviour to this package. However, `react-deploy-s3` expects your AWS credentials to be passed in as command arguments and requires additional configuration to get set up. In contrast, this package defers authentication to the AWS SDK and therefore supports multiple authentication strategies (e.g. IAM roles, environment variables and profiles).
 
