@@ -52,7 +52,7 @@ If depending on a named profile in `~/.aws/credentials` for authentication, use 
 
 Never prompt for confirmation.
 
-### Installing a `run-script` alias (optional)
+## Installation as a `run-script` alias (optional)
 
 Add a `deploy` script alias to your `package.json` file:
 
@@ -68,7 +68,7 @@ Run `npm run build` to build then `npm run deploy` to deploy.
 
 If you need to pass user-level options that you don't want committed into `package.json`, the you can provide these options at call-time, e.g. `npm run deploy -- --profile <profile>`.
 
-### Configuring for React apps built with `create-react-app`
+## Configuration for `create-react-app` projects
 
 Set the `--source` option to `/.build/`:
 
@@ -92,7 +92,7 @@ If you prefer to always run a build before deployment:
       }
     }
 
-### Alternatives (and why this package exists!)
+## Alternatives (and why this package exists!)
 
 * [AWS S3 Sync](https://docs.aws.amazon.com/cli/latest/reference/s3/sync.html) (bundled with [AWS CLI](https://aws.amazon.com/cli/))
 
