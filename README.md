@@ -42,7 +42,7 @@ If used, objects that do not exist locally will be deleted from the bucket.
 
 When used with the `--distribution` option, this can be used to set the invalidation path. If omitted, only the added, modified and deleted objects (if `--delete` option is used) are invalidated.
 
-This option is typically used to reduce [invalidation costs](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Invalidation.html#PayingForInvalidation) by using a wildcard pattern (e.g. `/*`).
+This option is typically used to reduce [invalidation costs](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Invalidation.html#PayingForInvalidation) by using a wildcard pattern (e.g. `--invalidation-path "/*"`).
 
 #### `--profile <name>`
 
