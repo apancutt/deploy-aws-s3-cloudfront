@@ -98,7 +98,7 @@ If you prefer to always run a build before deployment:
 
   The `aws s3 sync` command uses the modification time to identify modified assets. This doesn't work well when building a project often involves regenerating files with fresh timestamps but identical content.
 
-  This package will instead perform a checksum comparison to minimise the deployment payload. The MD5 checksum will be computed against all files then compared against the ETag of the corresponding remote objects.
+  This package will instead perform a checksum comparison to minimise the deployment payload. The MD5 checksum will be computed against local files then compared against the ETag of the corresponding remote objects.
 
 * [react-deploy-s3](https://www.npmjs.com/package/react-deploy-s3) (NPM package)
 
