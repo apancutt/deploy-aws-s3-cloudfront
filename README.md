@@ -60,7 +60,7 @@ Add a `deploy` script alias to your `package.json` file:
       ...
       "scripts": {
         ...
-        "deploy": "deploy-aws-s3-cloudfront [options]"
+        "deploy": "deploy-aws-s3-cloudfront --bucket my-bucket"
       }
     }
 
@@ -76,7 +76,7 @@ Set the `--source` option to `/.build/`:
       ...
       "scripts": {
         ...
-        "deploy": "deploy-aws-s3-cloudfront --source=./build/ [options]"
+        "deploy": "deploy-aws-s3-cloudfront --bucket my-bucket --source=./build/"
       }
     }
 
@@ -88,7 +88,7 @@ If you prefer to always run a build before deployment:
       ...
       "scripts": {
         ...
-        "deploy": "npm run build && deploy-aws-s3-cloudfront --source=./build/ [options]"
+        "deploy": "npm run build && deploy-aws-s3-cloudfront --bucket my-bucket --source=./build/"
       }
     }
 
