@@ -2,15 +2,15 @@
 
 Syncs a local directory to an AWS S3 bucket, optionally invalidating affected CloudFront paths.
 
-## Authentication
+## Installation
+
+    npm install --save deploy-aws-s3-cloudfront
+
+### Authentication
 
 This packages uses the [AWS SDK for Node.js](https://aws.amazon.com/sdk-for-node-js/) and defers authentication to the SDK.
 
 If you are relying on credentials stored in `~/.aws/credentials` you can use the `--profile` option to specify a named profile, if required.
-
-## Installation
-
-    npm install --save deploy-aws-s3-cloudfront
 
 ## Usage
 
