@@ -18,17 +18,17 @@ If you are relying on credentials stored in `~/.aws/credentials` you can use the
 
 ### Options
 
-#### `--bucket`
+#### `--bucket <name>`
 
 The name of the S3 bucket to sync to.
 
-#### `--distribution`
+#### `--distribution <ID>`
 
 The CloudFront distribution ID to invalidate after successful deployment.
 
 If omitted, no invalidation will be performed.
 
-#### `--exclude`
+#### `--exclude <pattern> [--exclude <pattern>...]`
 
 Exclude local paths from being synced to the bucket. Refer to the [fast-glob](https://www.npmjs.com/package/fast-glob) documentation for supported patterns.
 
@@ -38,13 +38,13 @@ Multiple paths can be specified by passing multiple `--exclude` options.
 
 If used, objects that do not exist locally will be deleted from the bucket.
 
-#### `--invalidation-path`
+#### `--invalidation-path <path>`
 
 When used with the `--distribution` option, this can be used to set the invalidation path. If omitted, only the added, modified and deleted objects (if `--delete` option is used) are invalidated.
 
 This option is typically used to reduce [invalidation costs](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Invalidation.html#PayingForInvalidation) by using a wildcard pattern (e.g. `/*`).
 
-#### `--profile`
+#### `--profile <name>`
 
 If depending on a named profile in `~/.aws/credentials` for authentication, use this option to provide the profile name.
 
