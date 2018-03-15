@@ -50,7 +50,7 @@ If depending on a named profile in `~/.aws/credentials` for authentication, use 
 
 #### `--non-interactive`
 
-Never prompt for confirmation.
+Never prompt for confirmation. This is particularly useful for automated deployment pipelines.
 
 ## Installation as a `run-script` alias (optional)
 
