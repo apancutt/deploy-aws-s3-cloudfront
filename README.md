@@ -14,27 +14,43 @@ If you are relying on credentials stored in `~/.aws/credentials` you can use the
 
 ## Usage
 
-    deploy-aws-s3-cloudfront [options]
-    
-    Syncs a local directory to an AWS S3 bucket, optionally invalidating affected
-    CloudFront paths.
-    
-    Options:
-      --help               Show help                                       [boolean]
-      --version            Show version number                             [boolean]
-      --bucket             AWS S3 bucket name to deploy to       [string] [required]
-      --distribution       AWS CloudFront distribution ID to invalidate     [string]
-      --source             Path to local directory to sync from
-                                                  [string] [required] [default: "."]
-      --destination        Path to remote directory to sync to
-                                                  [string] [required] [default: "/"]
-      --exclude            Patterns to exclude from deployment [array] [default: []]
-      --delete             Delete files from AWS S3 that do not exist locally
-                                                          [boolean] [default: false]
-      --invalidation-path  Set the invalidation path instead of automatically
-                           detecting objects to invalidate                  [string]
-      --profile            AWS profile to use as named in ~/.aws/credentials[string]
-      --non-interactive    Do not prompt for confirmation [boolean] [default: false]
+    deploy-aws-s3-cloudfront --bucket <bucket> [options]
+
+### Options
+
+#### `--bucket`
+
+The name of the S3 bucket to sync to.
+
+#### `--distribution`
+
+The CloudFront distribution ID to invalidate after successful deployment.
+
+If omitted, no invalidation will be performed.
+
+#### `--exclude`
+
+Exclude local paths from being synced to the bucket. Refer to the [fast-glob](https://www.npmjs.com/package/fast-glob) documentation for supported patterns.
+
+Multiple paths can be specified by passing multiple `--exclude` options.
+
+#### `--delete`
+
+If used, objects that do not exist locally will be deleted from the bucket.
+
+#### `--invalidation-path`
+
+When used with the `--distribution` option, this can be used to set the invalidation path. If omitted, only the added, modified and deleted objects (if `--delete` option is used) are invalidated.
+
+This option is typically used to reduce [invalidation costs](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Invalidation.html#PayingForInvalidation) by using a wildcard pattern (e.g. `/*`).
+
+#### `--profile`
+
+If depending on a named profile in `~/.aws/credentials` for authentication, use this option to provide the profile name.
+
+#### `--non-interactive`
+
+Never prompt for confirmation.
 
 ### Installing a `run-script` alias (optional)
 
@@ -50,7 +66,7 @@ Add a `deploy` script alias to your `package.json` file:
 
 Run `npm run build` to build then `npm run deploy` to deploy.
 
-If you need to pass user-level options that you don't wan't committed into `package.json`, the you can provide these options at call-time, e.g. `npm run deploy -- --profile <profile>`.
+If you need to pass user-level options that you don't want committed into `package.json`, the you can provide these options at call-time, e.g. `npm run deploy -- --profile <profile>`.
 
 ### Configuring for React apps built with `create-react-app`
 
