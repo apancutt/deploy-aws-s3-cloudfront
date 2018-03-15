@@ -82,7 +82,7 @@ Set the `--source` option to `/.build/`:
 
 Then simply run `npm run build` then `npm run deploy` to deploy the latest build output.
 
-If you prefer to always run a build before deployment:
+Alternatively, you can force a build before every deployment:
 
     {
       ...
