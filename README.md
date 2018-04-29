@@ -22,6 +22,13 @@ If you are relying on credentials stored in `~/.aws/credentials` you can use the
 
 The name of the S3 bucket to sync to.
 
+
+#### `--source <path>`
+
+Path to local directory to sync from.
+
+Default value `.`
+
 #### `--distribution <ID>`
 
 The CloudFront distribution ID to invalidate after successful deployment.
