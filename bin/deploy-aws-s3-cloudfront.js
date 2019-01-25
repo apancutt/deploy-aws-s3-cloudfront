@@ -25,6 +25,10 @@ const argv = yargs
     demand: true,
     describe: 'AWS S3 bucket name to deploy to',
   })
+  .option('acl', {
+    type: 'string',
+    describe: 'AWS S3 bucket ACL',
+  })
   .option('distribution', {
     type: 'string',
     describe: 'AWS CloudFront distribution ID to invalidate',
@@ -290,9 +294,12 @@ function deploy(uploads, deletes) {
 
         const defaults = {
           Bucket: argv.bucket,
-          ACL: 'public-read',
         };
-
+        
+        if(argv.acl === 'public'){
+          defaults.ACL= 'public-read'
+        }
+        
         try {
 
           if (!uploads.length) {
