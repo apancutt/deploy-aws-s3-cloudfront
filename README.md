@@ -22,6 +22,9 @@ If you are relying on credentials stored in `~/.aws/credentials` you can use the
 
 The name of the S3 bucket to sync to.
 
+#### `--acl public`
+
+Add public acl.
 
 #### `--source <path>`
 
