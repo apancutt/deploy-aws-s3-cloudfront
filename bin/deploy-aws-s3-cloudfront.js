@@ -293,11 +293,11 @@ function deploy(uploads, deletes) {
         const uploaded = [];
 
         const defaults = {
-          Bucket: argv.bucket,
+          Bucket: argv.bucket
         };
         
-        if(argv.acl === 'public'){
-          defaults.ACL= 'public-read'
+        if (argv.acl) {
+          defaults.ACL= argv.acl;
         }
         
         try {
