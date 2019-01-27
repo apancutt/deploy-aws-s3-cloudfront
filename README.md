@@ -22,6 +22,9 @@ If you are relying on credentials stored in `~/.aws/credentials` you can use the
 
 The name of the S3 bucket to sync to.
 
+#### `--acl <canned-acl>`
+
+A canned ACL string. See https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#upload-property for accepted values.
 
 #### `--source <path>`
 
