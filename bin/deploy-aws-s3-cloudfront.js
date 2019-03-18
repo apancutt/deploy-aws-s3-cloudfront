@@ -63,6 +63,12 @@ const argv = yargs
     type: 'string',
     describe: 'AWS profile to use as named in ~/.aws/credentials',
   })
+  .option('credentials', {
+    type: 'String',
+    demand: true,
+    describe: 'Set the path to your AWS credentials folder if not default to ~/.aws/credentials',
+    default: '~/.aws/credentials',
+  })
   .option('non-interactive', {
     type: 'boolean',
     describe: 'Do not prompt for confirmation',
@@ -87,6 +93,12 @@ if (argv.invalidationPath) {
 if (argv.profile) {
   aws.config.credentials = new aws.SharedIniFileCredentials({
     profile: argv.profile,
+  });
+}
+
+if (!path.isAbsolute(argv.credentials)) {
+  aws.config.credentials = new aws.SharedIniFileCredentials({
+    filename: path.resolve(argv.credentials)
   });
 }
 
@@ -295,11 +307,11 @@ function deploy(uploads, deletes) {
         const defaults = {
           Bucket: argv.bucket
         };
-        
+
         if (argv.acl) {
           defaults.ACL= argv.acl;
         }
-        
+
         try {
 
           if (!uploads.length) {

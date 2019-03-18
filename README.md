@@ -58,6 +58,10 @@ This option is typically used to reduce [invalidation costs](https://docs.aws.am
 
 If depending on a named profile in `~/.aws/credentials` for authentication, use this option to provide the profile name.
 
+#### `--credentials <path>`
+
+If you're using a differtent location as `~/.aws/credentials`, you can specify a different directory. This is useful if you're using automated deployment pipelines.
+
 #### `--non-interactive`
 
 Never prompt for confirmation. This is particularly useful for automated deployment pipelines.
