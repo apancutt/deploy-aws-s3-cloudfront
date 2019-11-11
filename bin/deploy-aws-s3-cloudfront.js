@@ -443,7 +443,7 @@ function invalidate(invalidations) {
       params.InvalidationBatch.Paths.Quantity = 0
 
       remaining.splice(0, 3000).forEach((key) => {
-        url = querystring.escape('/' + key).replace(/%2F/g, '/')
+        url = encodeInvalidationUrl('/' + key);
         console.log(colors.info('Invalidating ' + colors.bold(url) + ' on CloudFront distribution ' + colors.bold(argv.distribution) + '...'));
         params.InvalidationBatch.Paths.Items.push(url);
         params.InvalidationBatch.Paths.Quantity++;
@@ -461,6 +461,18 @@ function invalidate(invalidations) {
     }
 
   });
+}
+
+function encodeInvalidationUrl(str) {
+  // Invalidation URLs must be RFC1738 compliant
+  return encodeURIComponent(str)
+    .replace(/~/g, '%7E')
+    .replace(/!/g, '%21')
+    .replace(/'/g, '%27')
+    .replace(/\(/g, '%28')
+    .replace(/\)/g, '%29')
+    .replace(/\*/g, '%2A')
+    .replace(/%2F/g, '/'); // Retain slashes as these are accepted, and a leading slash is expected
 }
 
 function handleError(err, message) {
