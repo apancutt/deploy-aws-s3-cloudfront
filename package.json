@@ -1,6 +1,6 @@
 {
   "name": "deploy-aws-s3-cloudfront",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Syncs a local directory to an AWS S3 bucket, optionally invalidating affected CloudFront paths.",
   "keywords": [
     "aws",
