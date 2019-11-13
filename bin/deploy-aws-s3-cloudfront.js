@@ -57,7 +57,7 @@ const argv = yargs
   })
   .option('invalidation-path', {
     type: 'string',
-    describe: 'Set the invalidation path instead of automatically detecting objects to invalidate',
+    describe: 'Set the invalidation path (URL-encoded if necessary) instead of automatically detecting objects to invalidate',
   })
   .option('profile', {
     type: 'string',
@@ -295,11 +295,11 @@ function deploy(uploads, deletes) {
         const defaults = {
           Bucket: argv.bucket
         };
-        
+
         if (argv.acl) {
           defaults.ACL= argv.acl;
         }
-        
+
         try {
 
           if (!uploads.length) {
@@ -419,7 +419,7 @@ function invalidate(invalidations) {
     if (argv.invalidationPath) {
       remaining = [argv.invalidationPath];
     } else {
-      remaining = invalidations.slice(0);
+      remaining = invalidations.map((invalidation) => encodeInvalidationUrl('/' + invalidation));
     }
 
     const params = {
@@ -433,7 +433,7 @@ function invalidate(invalidations) {
       },
     };
 
-    if (!argv.distribution || !invalidations.length) {
+    if (!argv.distribution || !remaining.length) {
       resolve(invalidated);
     }
 
@@ -442,8 +442,7 @@ function invalidate(invalidations) {
       params.InvalidationBatch.Paths.Items = [];
       params.InvalidationBatch.Paths.Quantity = 0
 
-      remaining.splice(0, 3000).forEach((key) => {
-        url = encodeInvalidationUrl('/' + key);
+      remaining.splice(0, 3000).forEach((url) => {
         console.log(colors.info('Invalidating ' + colors.bold(url) + ' on CloudFront distribution ' + colors.bold(argv.distribution) + '...'));
         params.InvalidationBatch.Paths.Items.push(url);
         params.InvalidationBatch.Paths.Quantity++;
