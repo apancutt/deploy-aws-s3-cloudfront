@@ -4,7 +4,7 @@ const prettyBytes = require('pretty-bytes');
 const { info, warn } = require('./log');
 const { sanitizeFileSystemPrefix, sanitizeS3Prefix } = require('./utils');
 
-const UPLOAD_LIMIT = 1000;
+const DELETE_LIMIT = 1000; // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#deleteObjects-property
 
 const uploadObjects = async (s3, bucket, keys, localPrefix = '.', remotePrefix = '/', acl = undefined) => {
 
@@ -48,7 +48,7 @@ const deleteObjects = async (s3, bucket, keys, prefix = '/') => {
 
   while (remaining.length) {
 
-    const batch = remaining.splice(0, UPLOAD_LIMIT);
+    const batch = remaining.splice(0, DELETE_LIMIT);
     processed = processed.concat(batch);
 
     batch.forEach((remotePath) => {
