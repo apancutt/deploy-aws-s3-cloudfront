@@ -10,7 +10,7 @@ Syncs a local directory to an AWS S3 bucket, optionally invalidating affected Cl
 
 This packages uses the [AWS SDK for Node.js](https://aws.amazon.com/sdk-for-node-js/) and defers authentication to the SDK.
 
-If you are relying on credentials stored in `~/.aws/credentials` you can use the `--profile` option to specify a named profile, if required.
+If you are relying on credentials stored in `~/.aws/credentials` you can use `AWS_PROFILE=<profile> deploy-aws-s3-cloudfront ...` to use a custom-named profile.
 
 ## Usage
 
@@ -18,49 +18,55 @@ If you are relying on credentials stored in `~/.aws/credentials` you can use the
 
 ### Options
 
-#### `--bucket <name>`
-
-The name of the S3 bucket to sync to.
-
 #### `--acl <canned-acl>`
 
 A canned ACL string. See https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#upload-property for accepted values.
+
+#### `--bucket <name>` (required)
+
+AWS S3 bucket name to deploy to.
+
+#### `--delete`
+
+Delete files from AWS S3 that do not exist locally.
+
+#### `--destination <path>`
+
+Path to remote directory to sync to.
+
+Default value `/`
+
+#### `--distribution <ID>`
+
+AWS CloudFront distribution ID to invalidate.
+
+No invalidation is performed if this option is omitted.
+
+#### `--exclude <pattern> [--exclude <pattern>...]`
+
+Patterns to exclude from deployment.
+
+Refer to the [fast-glob](https://www.npmjs.com/package/fast-glob) documentation for supported patterns.
+
+Multiple paths can be specified by passing multiple `--exclude` options.
+
+#### `--invalidation-path <path>`
+
+Set the invalidation path (URL-encoded if necessary) instead of automatically detecting objects to invalidate.
+
+This can be used to explicity set the invalidation path rather than have the paths generated from the changeset.
+
+This option is typically used to reduce [invalidation costs](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Invalidation.html#PayingForInvalidation) by using a wildcard pattern (e.g. `--invalidation-path "/*"`).
+
+#### `--non-interactive`
+
+Do not prompt for confirmation.
 
 #### `--source <path>`
 
 Path to local directory to sync from.
 
 Default value `.`
-
-#### `--distribution <ID>`
-
-The CloudFront distribution ID to invalidate after successful deployment.
-
-If omitted, no invalidation will be performed.
-
-#### `--exclude <pattern> [--exclude <pattern>...]`
-
-Exclude local paths from being synced to the bucket. Refer to the [fast-glob](https://www.npmjs.com/package/fast-glob) documentation for supported patterns.
-
-Multiple paths can be specified by passing multiple `--exclude` options.
-
-#### `--delete`
-
-If used, objects that do not exist locally will be deleted from the bucket.
-
-#### `--invalidation-path <path>`
-
-When used with the `--distribution` option, this can be used to set the invalidation path. If omitted, only the added, modified and deleted objects (if `--delete` option is used) are invalidated.
-
-This option is typically used to reduce [invalidation costs](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Invalidation.html#PayingForInvalidation) by using a wildcard pattern (e.g. `--invalidation-path "/*"`).
-
-#### `--profile <name>`
-
-If depending on a named profile in `~/.aws/credentials` for authentication, use this option to provide the profile name.
-
-#### `--non-interactive`
-
-Never prompt for confirmation. This is particularly useful for automated deployment pipelines.
 
 ## Installation as a `run-script` alias (optional)
 
@@ -74,9 +80,9 @@ Add a `deploy` script alias to your `package.json` file:
       }
     }
 
-Run `npm run build` to build then `npm run deploy` to deploy.
+Run `yarn run deploy` to deploy.
 
-If you need to pass user-level options that you don't want committed into `package.json`, the you can provide these options at call-time, e.g. `npm run deploy -- --profile <profile>`.
+If you need to pass user or environment-level options that you don't want committed into `package.json` you can provide these at call-time, e.g. `yarn run deploy --distribution abc123`.
 
 ## Configuration for [create-react-app](https://github.com/facebook/create-react-app) projects
 
@@ -90,17 +96,7 @@ Set the `--source` option to `/.build/`:
       }
     }
 
-Then simply run `npm run build` then `npm run deploy` to deploy the latest build output.
-
-Alternatively, you can force a build before every deployment:
-
-    {
-      ...
-      "scripts": {
-        ...
-        "deploy": "npm run build && deploy-aws-s3-cloudfront --bucket my-bucket --source=./build/"
-      }
-    }
+Then simply run `yarn run build` then `yarn run deploy` to deploy the latest build output.
 
 ## Alternatives (and why this package exists!)
 
