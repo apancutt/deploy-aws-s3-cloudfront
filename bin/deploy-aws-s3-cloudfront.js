@@ -87,7 +87,17 @@ fetch(s3, argv.bucket, argv.source, argv.destination, argv.exclude)
   })
   .then(({ uploads, deletes }) => (
     deploy(s3, argv.bucket, uploads, deletes, argv.source, argv.destination, argv.acl)
-      .then((keys) => (argv.distribution ? invalidate(cloudfront, argv.distribution, argv.invalidationPath ? [ argv.invalidationPath ] : keys, !argv.invalidationPath) : []))
+      .then(({ uploaded, deleted }) => {
+
+        const changes = uploaded.concat(deleted);
+
+        if (!argv.distribution || !changes.length) {
+          return [];
+        }
+
+        return invalidate(cloudfront, argv.distribution, argv.invalidationPath ? [ argv.invalidationPath ] : changes, !argv.invalidationPath);
+
+      })
       .then((invalidations) => ({ uploads, deletes, invalidations }))
   ))
   .then(({ uploads, deletes, invalidations }) => info(`Deployment complete (${uploads.length} uploaded, ${deletes.length} deleted, ${invalidations.length} invalidated)`))
