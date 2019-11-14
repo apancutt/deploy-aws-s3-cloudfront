@@ -96,17 +96,7 @@ If you need to pass user or environment-level options that you don't want commit
 
 ## Configuration for [create-react-app](https://github.com/facebook/create-react-app) projects
 
-Set the `--source` option to `/.build/`:
-
-    {
-      ...
-      "scripts": {
-        ...
-        "deploy": "deploy-aws-s3-cloudfront --bucket my-bucket --source=./build/"
-      }
-    }
-
-Then simply run `yarn run build` then `yarn run deploy` to deploy the latest build output.
+Pass the `--react` option when deploying apps created using `create-react-app`. This is shortcut for `deploy-aws-s3-cloudfront --source ./build/ --no-cache index.html`.
 
 ## Alternatives (and why this package exists!)
 
