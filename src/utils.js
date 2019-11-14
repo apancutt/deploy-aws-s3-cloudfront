@@ -16,12 +16,10 @@ const sanitizeFileSystemPrefix = (prefix) => {
 
 const sanitizeS3Prefix = (prefix) => {
 
-  if (!prefix.startsWith('/')) {
-    prefix = `/${prefix}`;
-  }
+  prefix = prefix.replace(/^\//g, '');
 
-  if (!prefix.endsWith('/')) {
-    prefix += '/';
+  if (prefix && !prefix.endsWith('/')) {
+    prefix = `${prefix}/`;
   }
 
   return prefix;

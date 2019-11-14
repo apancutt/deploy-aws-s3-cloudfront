@@ -21,7 +21,7 @@ const uploadObjects = async (s3, bucket, keys, localPrefix = '.', remotePrefix =
 
     stream.on('error', (err) => { throw err; });
 
-    info(`Uploading ${localPath} (${prettyBytes(stats.size)}) to s3://${bucket}${remotePath} as ${type}`);
+    info(`Uploading ${localPath} to s3://${bucket}/${remotePath} (${type} ${prettyBytes(stats.size)})`);
 
     processed.push(remotePath);
 
@@ -52,7 +52,7 @@ const deleteObjects = async (s3, bucket, keys, prefix = '/') => {
     processed = processed.concat(batch);
 
     batch.forEach((remotePath) => {
-      warn(`Deleting s3://${bucket}${remotePath}`);
+      warn(`Deleting s3://${bucket}/${remotePath}`);
     });
 
     promises.push(s3.deleteObjects({
