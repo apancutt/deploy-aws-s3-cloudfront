@@ -56,9 +56,21 @@ This can be used to explicity set the invalidation path rather than have the pat
 
 This option is typically used to reduce [invalidation costs](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Invalidation.html#PayingForInvalidation) by using a wildcard pattern (e.g. `--invalidation-path "/*"`).
 
+#### `--no-cache <path>`
+
+Disable caching of specified S3 path(s).
+
+Multiple paths can be specified by passing multiple `--no-cache` options.
+
 #### `--non-interactive`
 
 Do not prompt for confirmation.
+
+#### `--react`
+
+Use recommended settings for `create-react-app`s and disable caching of `index.html`.
+
+Default value `false`
 
 #### `--source <path>`
 

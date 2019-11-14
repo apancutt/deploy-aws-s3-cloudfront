@@ -61,12 +61,30 @@ describe('deploy', () => {
 
   test('it sends the correct upload params', async () => {
 
-    expect.assertions(5);
+    expect.assertions(6);
 
-    return deploy(mockS3, 'foo', uploads, deletes, localPrefix, '', 'public-read').then(({ uploaded }) => {
+    return deploy(mockS3, 'foo', uploads, deletes, localPrefix).then(({ uploaded }) => {
+
+      expect(mockS3.lastUploadParams.ACL).toBeUndefined();
+      expect(mockS3.lastUploadParams.Body).toBeInstanceOf(fs.ReadStream);
+      expect(mockS3.lastUploadParams.CacheControl).toBeUndefined();
+      expect(mockS3.lastUploadParams.ContentLength).toBe(2);
+      expect(mockS3.lastUploadParams.ContentType).toBe('text/plain');
+      expect(mockS3.lastUploadParams.Key).toBe(uploaded[0]);
+
+    });
+
+  });
+
+  test('it sends the correct upload params with custom behaviour', async () => {
+
+    expect.assertions(6);
+
+    return deploy(mockS3, 'foo', uploads, deletes, localPrefix, '', 'public-read', [ uploads[0] ]).then(({ uploaded }) => {
 
       expect(mockS3.lastUploadParams.ACL).toBe('public-read');
       expect(mockS3.lastUploadParams.Body).toBeInstanceOf(fs.ReadStream);
+      expect(mockS3.lastUploadParams.CacheControl).toBe('no-cache');
       expect(mockS3.lastUploadParams.ContentLength).toBe(2);
       expect(mockS3.lastUploadParams.ContentType).toBe('text/plain');
       expect(mockS3.lastUploadParams.Key).toBe(uploaded[0]);

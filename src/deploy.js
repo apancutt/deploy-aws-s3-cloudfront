@@ -6,7 +6,7 @@ const { sanitizeFileSystemPrefix, sanitizeS3Prefix } = require('./utils');
 
 const DELETE_LIMIT = 1000; // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#deleteObjects-property
 
-const uploadObjects = async (s3, bucket, keys, localPrefix = '.', remotePrefix = '', acl = undefined) => {
+const uploadObjects = async (s3, bucket, keys, localPrefix = '.', remotePrefix = '', acl = undefined, noCache = []) => {
 
   const processed = [];
   const promises = [];
@@ -29,6 +29,7 @@ const uploadObjects = async (s3, bucket, keys, localPrefix = '.', remotePrefix =
       ACL: acl,
       Body: stream,
       Bucket: bucket,
+      CacheControl: noCache.includes(remotePath) ? 'no-cache' : undefined,
       ContentLength: stats.size,
       ContentType: type,
       Key: remotePath,
@@ -68,13 +69,13 @@ const deleteObjects = async (s3, bucket, keys, prefix = '') => {
 
 };
 
-module.exports = async (s3, bucket, uploads, deletes, localPrefix = '.', remotePrefix = '', acl = undefined) => {
+module.exports = async (s3, bucket, uploads, deletes, localPrefix = '.', remotePrefix = '', acl = undefined, noCache = []) => {
 
   localPrefix = sanitizeFileSystemPrefix(localPrefix);
   remotePrefix = sanitizeS3Prefix(remotePrefix);
 
   return Promise.all([
-    uploadObjects(s3, bucket, uploads, localPrefix, remotePrefix, acl),
+    uploadObjects(s3, bucket, uploads, localPrefix, remotePrefix, acl, noCache),
     deleteObjects(s3, bucket, deletes, remotePrefix),
   ]).then(([ uploaded, deleted ]) => ({ uploaded, deleted }));
 

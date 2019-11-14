@@ -34,7 +34,6 @@ const argv = yargs
   })
   .option('destination', {
     type: 'string',
-    demand: true,
     describe: 'Path to remote directory to sync to',
   })
   .option('distribution', {
@@ -50,9 +49,19 @@ const argv = yargs
     type: 'string',
     describe: 'Set the invalidation path (URL-encoded if necessary) instead of automatically detecting objects to invalidate',
   })
+  .option('no-cache', {
+    type: 'array',
+    describe: 'Disable caching of specified S3 path(s)',
+    default: [],
+  })
   .option('non-interactive', {
     type: 'boolean',
     describe: 'Do not prompt for confirmation',
+    default: false,
+  })
+  .option('react', {
+    type: 'boolean',
+    describe: 'Use recommended settings for create-react-apps and disable caching of index.html',
     default: false,
   })
   .option('source', {
@@ -64,6 +73,13 @@ const argv = yargs
 
 const s3 = new AWS.S3();
 const cloudfront = new AWS.CloudFront();
+
+if (argv.react) {
+  argv.noCache.push('index.html');
+  argv.source = './build/';
+}
+
+console.log(argv);process.exit();
 
 fetch(s3, argv.bucket, argv.source, argv.destination, argv.exclude)
   .then(({ local, remote }) => diff(local, remote, !argv.delete))
@@ -85,7 +101,7 @@ fetch(s3, argv.bucket, argv.source, argv.destination, argv.exclude)
 
   })
   .then(({ uploads, deletes }) => (
-    deploy(s3, argv.bucket, uploads, deletes, argv.source, argv.destination, argv.acl)
+    deploy(s3, argv.bucket, uploads, deletes, argv.source, argv.destination, argv.acl, argv.noCache)
       .then(({ uploaded, deleted }) => {
 
         const changes = uploaded.concat(deleted);
