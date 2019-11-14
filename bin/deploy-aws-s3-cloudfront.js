@@ -85,7 +85,10 @@ fetch(s3, argv.bucket, argv.source, argv.destination, argv.exclude)
     });
 
   })
-  .then(({ uploads, deletes }) => deploy(s3, argv.bucket, uploads, deletes, argv.source, argv.destination, argv.acl))
-  .then((keys) => (argv.distribution ? invalidate(cloudfront, argv.distribution, argv.invalidationPath ? [ argv.invalidationPath ] : keys, !argv.invalidationPath) : []))
-  .then(() => info('Deployment complete'))
+  .then(({ uploads, deletes }) => (
+    deploy(s3, argv.bucket, uploads, deletes, argv.source, argv.destination, argv.acl)
+      .then((keys) => (argv.distribution ? invalidate(cloudfront, argv.distribution, argv.invalidationPath ? [ argv.invalidationPath ] : keys, !argv.invalidationPath) : []))
+      .then((invalidations) => ({ uploads, deletes, invalidations }))
+  ))
+  .then(({ uploads, deletes, invalidations }) => info(`Deployment complete (${uploads.length} uploaded, ${deletes.length} deleted, ${invalidations.length} invalidated)`))
   .catch((err) => fatal(err.message));
