@@ -63,13 +63,13 @@ describe('deploy', () => {
 
     expect.assertions(5);
 
-    return deploy(mockS3, 'foo', uploads, deletes, localPrefix).then(({ uploaded }) => {
+    return deploy(mockS3, 'foo', uploads, deletes, localPrefix, '', 'public-read').then(({ uploaded }) => {
 
-      expect(mockS3.lastUploadParams.ACL).toBeUndefined();
+      expect(mockS3.lastUploadParams.ACL).toBe('public-read');
       expect(mockS3.lastUploadParams.Body).toBeInstanceOf(fs.ReadStream);
-      expect(mockS3.lastUploadParams.ContentLength).toEqual(2);
-      expect(mockS3.lastUploadParams.ContentType).toEqual('text/plain');
-      expect(mockS3.lastUploadParams.Key).toEqual(uploaded[0]);
+      expect(mockS3.lastUploadParams.ContentLength).toBe(2);
+      expect(mockS3.lastUploadParams.ContentType).toBe('text/plain');
+      expect(mockS3.lastUploadParams.Key).toBe(uploaded[0]);
 
     });
 
