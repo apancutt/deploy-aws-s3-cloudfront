@@ -26,8 +26,9 @@ describe('utils', () => {
 
   test('it sanitizes S3 prefixes', () => {
 
-    expect(sanitizeS3Prefix('/a')).toEqual('/a/');
-    expect(sanitizeS3Prefix('a')).toEqual('/a/');
+    expect(sanitizeS3Prefix('/')).toEqual('');
+    expect(sanitizeS3Prefix('/a')).toEqual('a/');
+    expect(sanitizeS3Prefix('a')).toEqual('a/');
 
   });
 

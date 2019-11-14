@@ -37,7 +37,7 @@ describe('fetch', () => {
     return fetch(mockS3, 'foo', localPrefix, 'some/nested/path').then(() => {
 
       expect(mockS3.lastListObjectsV2Params.Bucket).toEqual('foo');
-      expect(mockS3.lastListObjectsV2Params.Prefix).toEqual('/some/nested/path/');
+      expect(mockS3.lastListObjectsV2Params.Prefix).toEqual('some/nested/path/');
 
     });
 

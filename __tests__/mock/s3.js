@@ -11,7 +11,7 @@ class S3 {
     this.lastListObjectsV2Params = params;
     return promisable({
       Contents: [
-        { Key: '/a.txt', ETag: 'abc123' },
+        { Key: 'a.txt', ETag: 'abc123' },
       ],
       ContinuationToken: undefined,
       IsTruncated: false,

@@ -26,8 +26,8 @@ describe('deploy', () => {
 
     return deploy(mockS3, 'foo', uploads, deletes, localPrefix).then(({ uploaded, deleted }) => {
 
-      expect(uploaded).toEqual([ '/a.txt' ]);
-      expect(deleted).toEqual([ '/b.txt' ]);
+      expect(uploaded).toEqual([ 'a.txt' ]);
+      expect(deleted).toEqual([ 'b.txt' ]);
 
     });
 
@@ -39,8 +39,8 @@ describe('deploy', () => {
 
     return deploy(mockS3, 'foo', uploads, deletes, localPrefix, 'some/nested/folder').then(({ uploaded, deleted }) => {
 
-      expect(uploaded).toEqual([ '/some/nested/folder/a.txt' ]);
-      expect(deleted).toEqual([ '/some/nested/folder/b.txt' ]);
+      expect(uploaded).toEqual([ 'some/nested/folder/a.txt' ]);
+      expect(deleted).toEqual([ 'some/nested/folder/b.txt' ]);
 
     });
 
