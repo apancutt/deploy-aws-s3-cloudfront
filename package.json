@@ -20,7 +20,8 @@
   },
   "bin": "./bin/deploy-aws-s3-cloudfront.js",
   "files": [
-    "bin"
+    "bin",
+    "src"
   ],
   "dependencies": {
     "aws-sdk": "2",
