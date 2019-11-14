@@ -6,7 +6,7 @@ const { sanitizeFileSystemPrefix, sanitizeS3Prefix } = require('./utils');
 
 const DELETE_LIMIT = 1000; // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#deleteObjects-property
 
-const uploadObjects = async (s3, bucket, keys, localPrefix = '.', remotePrefix = '/', acl = undefined) => {
+const uploadObjects = async (s3, bucket, keys, localPrefix = '.', remotePrefix = '', acl = undefined) => {
 
   const processed = [];
   const promises = [];
@@ -40,7 +40,7 @@ const uploadObjects = async (s3, bucket, keys, localPrefix = '.', remotePrefix =
 
 };
 
-const deleteObjects = async (s3, bucket, keys, prefix = '/') => {
+const deleteObjects = async (s3, bucket, keys, prefix = '') => {
 
   let processed = [];
   const promises = [];
@@ -68,7 +68,7 @@ const deleteObjects = async (s3, bucket, keys, prefix = '/') => {
 
 };
 
-module.exports = async (s3, bucket, uploads, deletes, localPrefix = '.', remotePrefix = '/', acl = undefined) => {
+module.exports = async (s3, bucket, uploads, deletes, localPrefix = '.', remotePrefix = '', acl = undefined) => {
 
   localPrefix = sanitizeFileSystemPrefix(localPrefix);
   remotePrefix = sanitizeS3Prefix(remotePrefix);

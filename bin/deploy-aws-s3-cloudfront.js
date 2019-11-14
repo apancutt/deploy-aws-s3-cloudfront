@@ -36,7 +36,6 @@ const argv = yargs
     type: 'string',
     demand: true,
     describe: 'Path to remote directory to sync to',
-    default: '/',
   })
   .option('distribution', {
     type: 'string',

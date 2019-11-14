@@ -34,8 +34,6 @@ Delete files from AWS S3 that do not exist locally.
 
 Path to remote directory to sync to.
 
-Default value `/`
-
 #### `--distribution <ID>`
 
 AWS CloudFront distribution ID to invalidate.

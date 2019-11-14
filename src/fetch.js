@@ -55,7 +55,7 @@ const remoteObjects = async (s3, bucket, path) => {
 
 };
 
-module.exports = async (s3, bucket, localPrefix = '.', remotePrefix = '/', exclude = undefined) => {
+module.exports = async (s3, bucket, localPrefix = '.', remotePrefix = '', exclude = undefined) => {
 
   localPrefix = sanitizeFileSystemPrefix(localPrefix);
   remotePrefix = sanitizeS3Prefix(remotePrefix);
