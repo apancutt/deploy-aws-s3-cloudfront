@@ -1,37 +1,46 @@
 const S3 = require('./mock/s3');
 const fetch = require('../src/fetch');
 
-const mockLog = jest.spyOn(console, 'log').mockImplementation(jest.fn());
-const mockS3 = new S3();
+describe('fetch', () => {
 
-const localPrefix = `${__dirname}/mock/local-filesystem`;
+  let mockLog;
+  let mockS3;
 
-test('it fetches', async () => {
+  const localPrefix = `${__dirname}/mock/local-filesystem`;
 
-  expect.assertions(2);
+  beforeAll(() => {
+    mockLog = jest.spyOn(console, 'log').mockImplementation(jest.fn());
+    mockS3 = new S3();
+  });
 
-  return fetch(mockS3, 'foo', localPrefix).then(({ local, remote }) => {
+  afterAll(() => {
+    mockLog.mockRestore();
+  });
 
-    expect(local).toEqual({ 'a.txt': 'bf072e9119077b4e76437a93986787ef' });
-    expect(remote).toEqual({ 'a.txt': 'abc123' });
+  test('it fetches', async () => {
+
+    expect.assertions(2);
+
+    return fetch(mockS3, 'foo', localPrefix).then(({ local, remote }) => {
+
+      expect(local).toEqual({ 'a.txt': 'bf072e9119077b4e76437a93986787ef' });
+      expect(remote).toEqual({ 'a.txt': 'abc123' });
+
+    });
 
   });
 
-});
+  test('it sends the correct params', async () => {
 
-test('it sends the correct params', async () => {
+    expect.assertions(2);
 
-  expect.assertions(2);
+    return fetch(mockS3, 'foo', localPrefix, 'some/nested/path').then(() => {
 
-  return fetch(mockS3, 'foo', localPrefix, 'some/nested/path').then(() => {
+      expect(mockS3.lastListObjectsV2Params.Bucket).toEqual('foo');
+      expect(mockS3.lastListObjectsV2Params.Prefix).toEqual('/some/nested/path/');
 
-    expect(mockS3.lastListObjectsV2Params.Bucket).toEqual('foo');
-    expect(mockS3.lastListObjectsV2Params.Prefix).toEqual('/some/nested/path/');
+    });
 
   });
 
-});
-
-afterAll(() => {
-  mockLog.mockRestore();
 });

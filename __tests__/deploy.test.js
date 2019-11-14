@@ -2,68 +2,77 @@ const fs = require('fs');
 const S3 = require('./mock/s3');
 const deploy = require('../src/deploy');
 
-const mockLog = jest.spyOn(console, 'log').mockImplementation(jest.fn());
-const mockS3 = new S3();
+describe('deploy', () => {
 
-const uploads = [ 'a.txt' ];
-const deletes = [ 'b.txt' ];
-const localPrefix = `${__dirname}/mock/local-filesystem`;
+  let mockLog;
+  let mockS3;
 
-test('it deploys', async () => {
+  const uploads = [ 'a.txt' ];
+  const deletes = [ 'b.txt' ];
+  const localPrefix = `${__dirname}/mock/local-filesystem`;
 
-  expect.assertions(2);
+  beforeAll(() => {
+    mockLog = jest.spyOn(console, 'log').mockImplementation(jest.fn());
+    mockS3 = new S3();
+  });
 
-  return deploy(mockS3, 'foo', uploads, deletes, localPrefix).then(({ uploaded, deleted }) => {
+  afterAll(() => {
+    mockLog.mockRestore();
+  });
 
-    expect(uploaded).toEqual([ '/a.txt' ]);
-    expect(deleted).toEqual([ '/b.txt' ]);
+  test('it deploys', async () => {
+
+    expect.assertions(2);
+
+    return deploy(mockS3, 'foo', uploads, deletes, localPrefix).then(({ uploaded, deleted }) => {
+
+      expect(uploaded).toEqual([ '/a.txt' ]);
+      expect(deleted).toEqual([ '/b.txt' ]);
+
+    });
 
   });
 
-});
+  test('it deploys into destination prefix as instructed', async () => {
 
-test('it deploys into destination prefix as instructed', async () => {
+    expect.assertions(2);
 
-  expect.assertions(2);
+    return deploy(mockS3, 'foo', uploads, deletes, localPrefix, 'some/nested/folder').then(({ uploaded, deleted }) => {
 
-  return deploy(mockS3, 'foo', uploads, deletes, localPrefix, 'some/nested/folder').then(({ uploaded, deleted }) => {
+      expect(uploaded).toEqual([ '/some/nested/folder/a.txt' ]);
+      expect(deleted).toEqual([ '/some/nested/folder/b.txt' ]);
 
-    expect(uploaded).toEqual([ '/some/nested/folder/a.txt' ]);
-    expect(deleted).toEqual([ '/some/nested/folder/b.txt' ]);
-
-  });
-
-});
-
-test('it sends the correct delete params', async () => {
-
-  expect.assertions(2);
-
-  return deploy(mockS3, 'foo', uploads, deletes, localPrefix).then(({ deleted }) => {
-
-    expect(mockS3.lastDeleteParams.Bucket).toEqual('foo');
-    expect(mockS3.lastDeleteParams.Delete.Objects).toEqual(deleted.map((Key) => ({ Key })));
+    });
 
   });
 
-});
+  test('it sends the correct delete params', async () => {
 
-test('it sends the correct upload params', async () => {
+    expect.assertions(2);
 
-  expect.assertions(5);
+    return deploy(mockS3, 'foo', uploads, deletes, localPrefix).then(({ deleted }) => {
 
-  return deploy(mockS3, 'foo', uploads, deletes, localPrefix).then(({ uploaded }) => {
+      expect(mockS3.lastDeleteParams.Bucket).toEqual('foo');
+      expect(mockS3.lastDeleteParams.Delete.Objects).toEqual(deleted.map((Key) => ({ Key })));
 
-    expect(mockS3.lastUploadParams.ACL).toBeUndefined();
-    expect(mockS3.lastUploadParams.Body).toBeInstanceOf(fs.ReadStream);
-    expect(mockS3.lastUploadParams.ContentLength).toEqual(2);
-    expect(mockS3.lastUploadParams.ContentType).toEqual('text/plain');
-    expect(mockS3.lastUploadParams.Key).toEqual(uploaded[0]);
+    });
 
   });
 
-});
+  test('it sends the correct upload params', async () => {
 
-afterAll(() => {
-  mockLog.mockRestore();
+    expect.assertions(5);
+
+    return deploy(mockS3, 'foo', uploads, deletes, localPrefix).then(({ uploaded }) => {
+
+      expect(mockS3.lastUploadParams.ACL).toBeUndefined();
+      expect(mockS3.lastUploadParams.Body).toBeInstanceOf(fs.ReadStream);
+      expect(mockS3.lastUploadParams.ContentLength).toEqual(2);
+      expect(mockS3.lastUploadParams.ContentType).toEqual('text/plain');
+      expect(mockS3.lastUploadParams.Key).toEqual(uploaded[0]);
+
+    });
+
+  });
+
 });

@@ -1,41 +1,49 @@
 const diff = require('../src/diff');
 
-const mockLog = jest.spyOn(console, 'log').mockImplementation(jest.fn());
+describe('diff', () => {
 
-const local = {
-  'new.txt': 'abc123',
-  'modified.txt': 'abc456',
-};
+  let mockLog;
 
-const remote = {
-  'modified.txt': 'abc123',
-  'deleted.txt': 'abc123',
-};
+  const local = {
+    'new.txt': 'abc123',
+    'modified.txt': 'abc456',
+  };
 
-test('it computes diff', async () => {
+  const remote = {
+    'modified.txt': 'abc123',
+    'deleted.txt': 'abc123',
+  };
 
-  expect.assertions(3);
+  beforeAll(() => {
+    mockLog = jest.spyOn(console, 'log').mockImplementation(jest.fn());
+  });
 
-  return diff(local, remote).then(({ added, modified, deleted }) => {
+  afterAll(() => {
+    mockLog.mockRestore();
+  });
 
-    expect(added).toEqual([ 'new.txt' ]);
-    expect(modified).toEqual([ 'modified.txt' ]);
-    expect(deleted).toEqual([]);
+  test('it computes diff', async () => {
+
+    expect.assertions(3);
+
+    return diff(local, remote).then(({ added, modified, deleted }) => {
+
+      expect(added).toEqual([ 'new.txt' ]);
+      expect(modified).toEqual([ 'modified.txt' ]);
+      expect(deleted).toEqual([]);
+
+    });
 
   });
 
-});
+  test('it computes diff without ignoring deleted', async () => {
 
-test('it computes diff without ignoring deleted', async () => {
+    expect.assertions(1);
 
-  expect.assertions(1);
+    return diff(local, remote, false).then(({ deleted }) => {
+      expect(deleted).toEqual([ 'deleted.txt' ]);
+    });
 
-  return diff(local, remote, false).then(({ deleted }) => {
-    expect(deleted).toEqual([ 'deleted.txt' ]);
   });
 
-});
-
-afterAll(() => {
-  mockLog.mockRestore();
 });
