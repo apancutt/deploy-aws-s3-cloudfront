@@ -1,9 +1,6 @@
 const diff = require('../src/diff');
-let mockLog;
 
-beforeAll(() => {
-  mockLog = jest.spyOn(console, 'log').mockImplementation(() => {});
-});
+const mockLog = jest.spyOn(console, 'log').mockImplementation(jest.fn());
 
 const local = {
   'new.txt': 'abc123',

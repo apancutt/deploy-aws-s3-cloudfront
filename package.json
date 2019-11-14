@@ -52,5 +52,11 @@
     },
     "parser": "babel-eslint",
     "extends": "eslint:recommended"
+  },
+  "jest": {
+    "testPathIgnorePatterns": [
+      "/__tests__/mock/",
+      "/node_modules/"
+    ]
   }
 }

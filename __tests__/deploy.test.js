@@ -1,37 +1,19 @@
 const fs = require('fs');
+const S3 = require('./mock/s3');
 const deploy = require('../src/deploy');
-let s3, lastDeleteParams, lastUploadParams, mockLog;
+
+const mockLog = jest.spyOn(console, 'log').mockImplementation(jest.fn());
+const mockS3 = new S3();
 
 const uploads = [ 'a.txt' ];
 const deletes = [ 'b.txt' ];
-const localPrefix = `${__dirname}/mock`;
-
-beforeAll(() => {
-
-  s3 = {
-    deleteObjects: (params) => {
-      lastDeleteParams = params;
-      return {
-        promise: () => Promise.resolve(),
-      };
-    },
-    upload: (params) => {
-      lastUploadParams = params;
-      return {
-        promise: () => Promise.resolve(),
-      };
-    },
-  };
-
-  mockLog = jest.spyOn(console, 'log').mockImplementation(() => {});
-
-});
+const localPrefix = `${__dirname}/mock/local-filesystem`;
 
 test('it deploys', async () => {
 
   expect.assertions(2);
 
-  return deploy(s3, 'foo', uploads, deletes, localPrefix).then(({ uploaded, deleted }) => {
+  return deploy(mockS3, 'foo', uploads, deletes, localPrefix).then(({ uploaded, deleted }) => {
 
     expect(uploaded).toEqual([ '/a.txt' ]);
     expect(deleted).toEqual([ '/b.txt' ]);
@@ -44,7 +26,7 @@ test('it deploys into destination prefix as instructed', async () => {
 
   expect.assertions(2);
 
-  return deploy(s3, 'foo', uploads, deletes, localPrefix, 'some/nested/folder').then(({ uploaded, deleted }) => {
+  return deploy(mockS3, 'foo', uploads, deletes, localPrefix, 'some/nested/folder').then(({ uploaded, deleted }) => {
 
     expect(uploaded).toEqual([ '/some/nested/folder/a.txt' ]);
     expect(deleted).toEqual([ '/some/nested/folder/b.txt' ]);
@@ -57,10 +39,10 @@ test('it sends the correct delete params', async () => {
 
   expect.assertions(2);
 
-  return deploy(s3, 'foo', uploads, deletes, localPrefix).then(({ deleted }) => {
+  return deploy(mockS3, 'foo', uploads, deletes, localPrefix).then(({ deleted }) => {
 
-    expect(lastDeleteParams.Bucket).toEqual('foo');
-    expect(lastDeleteParams.Delete.Objects).toEqual(deleted.map((Key) => ({ Key })));
+    expect(mockS3.lastDeleteParams.Bucket).toEqual('foo');
+    expect(mockS3.lastDeleteParams.Delete.Objects).toEqual(deleted.map((Key) => ({ Key })));
 
   });
 
@@ -70,21 +52,18 @@ test('it sends the correct upload params', async () => {
 
   expect.assertions(5);
 
-  return deploy(s3, 'foo', uploads, deletes, localPrefix).then(({ uploaded }) => {
+  return deploy(mockS3, 'foo', uploads, deletes, localPrefix).then(({ uploaded }) => {
 
-    expect(lastUploadParams.ACL).toBeUndefined();
-    expect(lastUploadParams.Body).toBeInstanceOf(fs.ReadStream);
-    expect(lastUploadParams.ContentLength).toEqual(2);
-    expect(lastUploadParams.ContentType).toEqual('text/plain');
-    expect(lastUploadParams.Key).toEqual(uploaded[0]);
+    expect(mockS3.lastUploadParams.ACL).toBeUndefined();
+    expect(mockS3.lastUploadParams.Body).toBeInstanceOf(fs.ReadStream);
+    expect(mockS3.lastUploadParams.ContentLength).toEqual(2);
+    expect(mockS3.lastUploadParams.ContentType).toEqual('text/plain');
+    expect(mockS3.lastUploadParams.Key).toEqual(uploaded[0]);
 
   });
 
 });
 
 afterAll(() => {
-  s3 = undefined;
-  lastDeleteParams = undefined;
-  lastUploadParams = undefined;
   mockLog.mockRestore();
 });

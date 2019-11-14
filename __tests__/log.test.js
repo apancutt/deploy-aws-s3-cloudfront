@@ -1,20 +1,16 @@
-const log = require('../src/log');
+const { debug, error, fatal, info, warn } = require('../src/log');
 
-let lastLogOutput, mockExit, mockLog;
-
-beforeAll(() => {
-  mockLog = jest.spyOn(console, 'log').mockImplementation((message) => { lastLogOutput = message; });
-  mockExit = jest.spyOn(process, 'exit').mockImplementation(() => {});
-});
+const mockLog = jest.spyOn(console, 'log').mockImplementation(jest.fn());
+const mockExit = jest.spyOn(process, 'exit').mockImplementation(jest.fn());
 
 test('it logs', () => {
 
-  [ 'debug', 'info', 'warn', 'error', 'fatal' ].forEach((level) => {
+  [ debug, error, fatal, info, warn ].forEach((level) => {
 
-    const message = `Some ${level} message`;
-    log[level](message);
+    const message = `${Math.round(Math.random() * 100000000)}`;
+    level(message);
 
-    expect(lastLogOutput).toContain(message);
+    expect(mockLog.mock.calls.splice(-1)[0][0]).toContain(message);
 
   });
 
@@ -22,14 +18,13 @@ test('it logs', () => {
 
 test('it terminates with an exit status', () => {
 
-  log.fatal('Some fatal message', 123);
+  fatal('Some message', 123);
 
   expect(mockExit).toHaveBeenCalledWith(123);
 
 });
 
 afterAll(() => {
-  lastLogOutput = undefined;
   mockExit.mockRestore();
   mockLog.mockRestore();
 });
