@@ -12,8 +12,9 @@ describe('utils', () => {
   test('it sanitizes CloudFront keys', () => {
 
     expect(sanitizeCloudFrontKey('foo')).toEqual('/foo');
+    expect(sanitizeCloudFrontKey('/foo')).toEqual('/foo');
+    expect(sanitizeCloudFrontKey('/foo/')).toEqual('/foo/');
     expect(sanitizeCloudFrontKey('%2Ffoo')).toEqual('/foo');
-    expect(sanitizeCloudFrontKey('//foo')).toEqual('/foo');
 
   });
 

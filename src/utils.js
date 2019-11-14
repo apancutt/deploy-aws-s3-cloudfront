@@ -1,5 +1,8 @@
 const path = require('path');
 
+/**
+ * Returns the absolute path with a trailing slash.
+ */
 const sanitizeFileSystemPrefix = (prefix) => {
 
   if (!path.isAbsolute(prefix)) {
@@ -14,6 +17,9 @@ const sanitizeFileSystemPrefix = (prefix) => {
 
 };
 
+/**
+ * Remove leading slash but ensure a non-empty prefix has a trailing slash.
+ */
 const sanitizeS3Prefix = (prefix) => {
 
   prefix = prefix.replace(/^\//g, '');
@@ -26,6 +32,9 @@ const sanitizeS3Prefix = (prefix) => {
 
 }
 
+/**
+ * Invalidation paths must be encoded as per RFC1738.
+ */
 const encodeCloudFrontKey = (key) => (
   encodeURIComponent(key)
     .replace(/~/g, '%7E')
@@ -36,9 +45,20 @@ const encodeCloudFrontKey = (key) => (
     .replace(/\*/g, '%2A')
 );
 
-const sanitizeCloudFrontKey = (path) => (
-  `/${path}`.replace(/%2F/g, '/').replace(/\/+/g, '/')
-);
+/**
+ * Unencode slashes and ensure path contains a leading slash.
+ */
+const sanitizeCloudFrontKey = (path) => {
+
+  path = path.replace(/%2F/g, '/');
+
+  if (!path.startsWith('/')) {
+    path = `/${path}`;
+  }
+
+  return path;
+
+};
 
 module.exports = {
   encodeCloudFrontKey,
