@@ -27,7 +27,7 @@ const localObjects = async (path, exclude = undefined) => {
 
 const remoteObjects = async (s3, bucket, path) => {
 
-  debug(`Fetching remote objects from s3://${bucket}${path}`);
+  debug(`Fetching remote objects from s3://${bucket}/${path}`);
 
   const results = {};
 
