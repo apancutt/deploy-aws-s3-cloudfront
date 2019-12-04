@@ -56,11 +56,11 @@ This can be used to explicity set the invalidation path rather than have the pat
 
 This option is typically used to reduce [invalidation costs](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Invalidation.html#PayingForInvalidation) by using a wildcard pattern (e.g. `--invalidation-path "/*"`).
 
-#### `--no-cache <path>`
+#### `--noCache <path>`
 
 Disable caching of specified S3 path(s).
 
-Multiple paths can be specified by passing multiple `--no-cache` options.
+Multiple paths can be specified by passing multiple `--noCache` options.
 
 #### `--non-interactive`
 
@@ -96,7 +96,7 @@ If you need to pass user or environment-level options that you don't want commit
 
 ## Configuration for [create-react-app](https://github.com/facebook/create-react-app) projects
 
-Pass the `--react` option when deploying apps created using `create-react-app`. This is shortcut for `deploy-aws-s3-cloudfront --source ./build/ --no-cache index.html`.
+Pass the `--react` option when deploying apps created using `create-react-app`. This is shortcut for `deploy-aws-s3-cloudfront --source ./build/ --noCache index.html`.
 
 ## Alternatives (and why this package exists!)
 

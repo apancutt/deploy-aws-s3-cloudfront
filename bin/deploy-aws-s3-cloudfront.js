@@ -49,7 +49,7 @@ const argv = yargs
     type: 'string',
     describe: 'Set the invalidation path (URL-encoded if necessary) instead of automatically detecting objects to invalidate',
   })
-  .option('no-cache', {
+  .option('noCache', {
     type: 'array',
     describe: 'Disable caching of specified S3 path(s)',
     default: [],
