@@ -49,7 +49,7 @@ const argv = yargs
     type: 'string',
     describe: 'Set the invalidation path (URL-encoded if necessary) instead of automatically detecting objects to invalidate',
   })
-  .option('no-cache', {
+  .option('cache-control-no-cache', {
     type: 'array',
     describe: 'Disable caching of specified S3 path(s)',
     default: [],
@@ -75,9 +75,12 @@ const s3 = new AWS.S3();
 const cloudfront = new AWS.CloudFront();
 
 if (argv.react) {
-  argv.noCache.push('index.html');
+  argv.cacheControlNoCache.push('index.html');
   argv.source = './build/';
 }
+
+console.log(argv);
+process.exit();
 
 fetch(s3, argv.bucket, argv.source, argv.destination, argv.exclude)
   .then(({ local, remote }) => diff(local, remote, !argv.delete))
@@ -99,7 +102,7 @@ fetch(s3, argv.bucket, argv.source, argv.destination, argv.exclude)
 
   })
   .then(({ uploads, deletes }) => (
-    deploy(s3, argv.bucket, uploads, deletes, argv.source, argv.destination, argv.acl, argv.noCache)
+    deploy(s3, argv.bucket, uploads, deletes, argv.source, argv.destination, argv.acl, argv.cacheControlNoCache)
       .then(({ uploaded, deleted }) => {
 
         const changes = uploaded.concat(deleted);
