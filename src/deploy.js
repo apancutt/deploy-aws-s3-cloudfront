@@ -6,6 +6,13 @@ const { sanitizeFileSystemPrefix, sanitizeS3Prefix } = require('./utils');
 
 const DELETE_LIMIT = 1000; // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#deleteObjects-property
 
+const cacheControl = (path, paths) => (
+  (
+    paths.includes(path)
+    || paths.find((p) => (p.endsWith('/') || p.endsWith('*')) && new RegExp(`^${p.replace(/\/?\*?$/, '.*')}$`).test(path))
+  ) ? 'no-cache' : undefined
+);
+
 const uploadObjects = async (s3, bucket, keys, localPrefix = '.', remotePrefix = '', acl = undefined, cacheControlNoCache = []) => {
 
   const processed = [];
@@ -29,7 +36,7 @@ const uploadObjects = async (s3, bucket, keys, localPrefix = '.', remotePrefix =
       ACL: acl,
       Body: stream,
       Bucket: bucket,
-      CacheControl: cacheControlNoCache.includes(remotePath) ? 'no-cache' : undefined,
+      CacheControl: cacheControl(remotePath, cacheControlNoCache),
       ContentLength: stats.size,
       ContentType: type,
       Key: remotePath,
