@@ -56,9 +56,7 @@ This option is typically used to reduce [invalidation costs](https://docs.aws.am
 
 #### `--cache-control-no-cache <path> [<path>...]`
 
-Disable caching of specified S3 path(s). Paths ending with a `/` or `*` will be treated as wildcards.
-
-For example, any of the following `<path>` values will disable caching of objects with the root `build` directory: `build/`, `build/*` or `build*`.
+Disable caching of specified S3 path(s). Paths ending with a `*` will be treated as wildcards.
 
 #### `--non-interactive`
 

@@ -9,7 +9,7 @@ const DELETE_LIMIT = 1000; // https://docs.aws.amazon.com/AWSJavaScriptSDK/lates
 const cacheControl = (path, paths) => (
   (
     paths.includes(path)
-    || paths.find((p) => (p.endsWith('/') || p.endsWith('*')) && new RegExp(`^${p.replace(/\/?\*?$/, '.*')}$`).test(path))
+    || paths.find((p) => p.endsWith('*') && new RegExp(`^${p.replace(/\*?$/, '.*')}$`).test(path))
   ) ? 'no-cache' : undefined
 );
 
