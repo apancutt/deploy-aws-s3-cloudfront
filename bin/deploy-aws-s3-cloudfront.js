@@ -79,9 +79,6 @@ if (argv.react) {
   argv.source = './build/';
 }
 
-console.log(argv);
-process.exit();
-
 fetch(s3, argv.bucket, argv.source, argv.destination, argv.exclude)
   .then(({ local, remote }) => diff(local, remote, !argv.delete))
   .then(({ added, modified, deleted }) => {
