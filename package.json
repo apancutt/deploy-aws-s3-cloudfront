@@ -29,6 +29,7 @@
     "fast-glob": "3",
     "md5-file": "4",
     "mime-types": "2",
+    "minimatch": "^3.0.4",
     "pretty-bytes": "5",
     "prompt-confirm": "2",
     "yargs": "14"

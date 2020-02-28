@@ -69,6 +69,10 @@ const argv = yargs
     describe: 'Path to local directory to sync from',
     default: '.',
   })
+  .option('cache-control', {
+    type: 'array',
+    default: []
+  })
   .argv;
 
 const s3 = new AWS.S3();
@@ -99,7 +103,7 @@ fetch(s3, argv.bucket, argv.source, argv.destination, argv.exclude)
 
   })
   .then(({ uploads, deletes }) => (
-    deploy(s3, argv.bucket, uploads, deletes, argv.source, argv.destination, argv.acl, argv.cacheControlNoCache)
+    deploy(s3, argv.bucket, uploads, deletes, argv.source, argv.destination, argv.acl, argv.cacheControlNoCache, argv.cacheControl)
       .then(({ uploaded, deleted }) => {
 
         const changes = uploaded.concat(deleted);

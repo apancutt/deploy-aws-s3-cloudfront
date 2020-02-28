@@ -1,6 +1,9 @@
 const promisable = require('./promisable');
 
 class S3 {
+  constructor () {
+    this.uploadCalls = [];
+  }
 
   deleteObjects(params) {
     this.lastDeleteParams = params;
@@ -19,6 +22,7 @@ class S3 {
   }
 
   upload(params) {
+    this.uploadCalls.push({ ...params });
     this.lastUploadParams = params;
     return promisable();
   }

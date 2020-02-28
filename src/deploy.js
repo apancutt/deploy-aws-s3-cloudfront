@@ -1,19 +1,33 @@
 const fs = require('fs');
 const mimeTypes = require('mime-types');
 const prettyBytes = require('pretty-bytes');
-const { info, warn } = require('./log');
+const minimatch = require('minimatch');
+const { debug, info, warn } = require('./log');
 const { sanitizeFileSystemPrefix, sanitizeS3Prefix } = require('./utils');
 
 const DELETE_LIMIT = 1000; // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#deleteObjects-property
 
-const cacheControl = (path, paths) => (
-  (
-    paths.includes(path)
-    || paths.find((p) => p.endsWith('*') && new RegExp(`^${p.replace(/\*?$/, '.*')}$`).test(path))
-  ) ? 'no-cache' : undefined
-);
+const cacheControl = (path, noCachePaths, cacheControlOptions) => {
+  let cacheControl;
+  cacheControlOptions.forEach((optionString) => {
+    const option = optionString.split('=');
+    const glob = option[0];
+    const cacheControlValue = option[1];
+    if (cacheControlValue && minimatch(path, glob, { nonegate: true })) {
+      cacheControl = cacheControlValue;
+    }
+  });
+  if (!cacheControl) {
+    cacheControl = (
+      noCachePaths.includes(path)
+      || noCachePaths.find((p) => p.endsWith('*') && new RegExp(`^${p.replace(/\*?$/, '.*')}$`).test(path))
+    ) ? 'no-cache' : undefined;
+  }
+  debug(`Cache-control for ${path} is set to ${cacheControl}`);
+  return cacheControl;
+};
 
-const uploadObjects = async (s3, bucket, keys, localPrefix = '.', remotePrefix = '', acl = undefined, cacheControlNoCache = []) => {
+const uploadObjects = async (s3, bucket, keys, localPrefix = '.', remotePrefix = '', acl = undefined, cacheControlNoCache = [], cacheControlOptions) => {
 
   const processed = [];
   const promises = [];
@@ -36,7 +50,7 @@ const uploadObjects = async (s3, bucket, keys, localPrefix = '.', remotePrefix =
       ACL: acl,
       Body: stream,
       Bucket: bucket,
-      CacheControl: cacheControl(remotePath, cacheControlNoCache),
+      CacheControl: cacheControl(key, cacheControlNoCache, cacheControlOptions),
       ContentLength: stats.size,
       ContentType: type,
       Key: remotePath,
@@ -76,13 +90,13 @@ const deleteObjects = async (s3, bucket, keys, prefix = '') => {
 
 };
 
-module.exports = async (s3, bucket, uploads, deletes, localPrefix = '.', remotePrefix = '', acl = undefined, cacheControlNoCache = []) => {
+module.exports = async (s3, bucket, uploads, deletes, localPrefix = '.', remotePrefix = '', acl = undefined, cacheControlNoCache = [], cacheControl = []) => {
 
   localPrefix = sanitizeFileSystemPrefix(localPrefix);
   remotePrefix = sanitizeS3Prefix(remotePrefix);
 
   return Promise.all([
-    uploadObjects(s3, bucket, uploads, localPrefix, remotePrefix, acl, cacheControlNoCache),
+    uploadObjects(s3, bucket, uploads, localPrefix, remotePrefix, acl, cacheControlNoCache, cacheControl),
     deleteObjects(s3, bucket, deletes, remotePrefix),
   ]).then(([ uploaded, deleted ]) => ({ uploaded, deleted }));
 

@@ -93,4 +93,24 @@ describe('deploy', () => {
 
   });
 
+  test('it sends the correct cache-control params', async () => {
+
+    expect.assertions(1);
+
+    const localUploads = ['static/a.js', 'static/subfolder/b.js', 'static/c.css', 'a.txt'];
+
+    return deploy(mockS3, 'foo', localUploads, deletes, localPrefix, '', 'public-read', [], ['static/**/*.js=max-age:300', 'a.txt=no-cache']).then(() => {
+      const cacheControlByAWSKey = {};
+      mockS3.uploadCalls.forEach((call) => {
+        cacheControlByAWSKey[call.Key] = call.CacheControl;
+      });
+      expect(cacheControlByAWSKey).toEqual({
+        'static/a.js': 'max-age:300',
+        'static/subfolder/b.js': 'max-age:300',
+        'static/c.css': undefined,
+        'a.txt': 'no-cache'
+      });
+    });
+  });
+
 });
