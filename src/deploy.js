@@ -10,9 +10,9 @@ const DELETE_LIMIT = 1000; // https://docs.aws.amazon.com/AWSJavaScriptSDK/lates
 const cacheControl = (path, noCachePaths, cacheControlOptions) => {
   let cacheControl;
   cacheControlOptions.forEach((optionString) => {
-    const option = optionString.split('=');
-    const glob = option[0];
-    const cacheControlValue = option[1];
+    const equalPosition = optionString.indexOf('=');
+    const glob = optionString.substring(0, equalPosition);
+    const cacheControlValue = optionString.substring(equalPosition + 1);
     if (cacheControlValue && minimatch(path, glob, { nonegate: true })) {
       cacheControl = cacheControlValue;
     }
