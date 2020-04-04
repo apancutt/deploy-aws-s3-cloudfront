@@ -6,14 +6,21 @@ const { sanitizeFileSystemPrefix, sanitizeS3Prefix } = require('./utils');
 
 const DELETE_LIMIT = 1000; // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#deleteObjects-property
 
-const cacheControl = (path, paths) => (
-  (
-    paths.includes(path)
-    || paths.find((p) => p.endsWith('*') && new RegExp(`^${p.replace(/\*?$/, '.*')}$`).test(path))
-  ) ? 'no-cache' : undefined
-);
+const computeCacheControl = (path, cacheControl) => {
 
-const uploadObjects = async (s3, bucket, keys, localPrefix = '.', remotePrefix = '', acl = undefined, cacheControlNoCache = []) => {
+  const match = Object.entries(cacheControl).find(([ cacheControlPath ]) => (
+    (cacheControlPath === path)
+    || (
+      cacheControlPath.endsWith('*')
+      && new RegExp(`^${cacheControlPath.replace(/\*?$/, '.*')}$`).test(path)
+    )
+  ));
+
+  return match && match[1];
+
+};
+
+const uploadObjects = async (s3, bucket, keys, localPrefix = '.', remotePrefix = '', acl = undefined, cacheControl = {}) => {
 
   const processed = [];
   const promises = [];
@@ -25,10 +32,11 @@ const uploadObjects = async (s3, bucket, keys, localPrefix = '.', remotePrefix =
     const type = mimeTypes.lookup(localPath) || 'application/octet-stream';
     const stats = fs.statSync(localPath);
     const stream = fs.createReadStream(localPath);
+    const computedCacheControl = computeCacheControl(remotePath, cacheControl);
 
     stream.on('error', (err) => { throw err; });
 
-    info(`Uploading ${localPath} to s3://${bucket}/${remotePath} (${type} ${prettyBytes(stats.size)})`);
+    info(`Uploading ${localPath} to s3://${bucket}/${remotePath} (${type} ${prettyBytes(stats.size)} CacheControl:${computedCacheControl || 'unset'})`);
 
     processed.push(remotePath);
 
@@ -36,7 +44,7 @@ const uploadObjects = async (s3, bucket, keys, localPrefix = '.', remotePrefix =
       ACL: acl,
       Body: stream,
       Bucket: bucket,
-      CacheControl: cacheControl(remotePath, cacheControlNoCache),
+      CacheControl: computedCacheControl,
       ContentLength: stats.size,
       ContentType: type,
       Key: remotePath,

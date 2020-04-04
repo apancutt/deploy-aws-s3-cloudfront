@@ -26,6 +26,10 @@ A canned ACL string. See https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS
 
 AWS S3 bucket name to deploy to.
 
+#### `--cache-control <path>:<value> [<path>:<value>...]`
+
+Set CacheControl values for S3 path(s). Paths ending with a `*` will be treated as wildcards.
+
 #### `--delete`
 
 Delete files from AWS S3 that do not exist locally.
@@ -53,10 +57,6 @@ Set the invalidation path (URL-encoded if necessary) instead of automatically de
 This can be used to explicity set the invalidation path rather than have the paths generated from the changeset.
 
 This option is typically used to reduce [invalidation costs](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Invalidation.html#PayingForInvalidation) by using a wildcard pattern (e.g. `--invalidation-path "/*"`).
-
-#### `--cache-control-no-cache <path> [<path>...]`
-
-Disable caching of specified S3 path(s). Paths ending with a `*` will be treated as wildcards.
 
 #### `--non-interactive`
 
@@ -92,7 +92,7 @@ If you need to pass user or environment-level options that you don't want commit
 
 ## Configuration for [create-react-app](https://github.com/facebook/create-react-app) projects
 
-Pass the `--react` option when deploying apps created using `create-react-app`. This is shortcut for `deploy-aws-s3-cloudfront --source ./build/ --cache-control-no-cache index.html`.
+Pass the `--react` option when deploying apps created using `create-react-app`. This is shortcut for `deploy-aws-s3-cloudfront --source ./build/ --cache-control index.html:no-cache`.
 
 ## Alternatives (and why this package exists!)
 

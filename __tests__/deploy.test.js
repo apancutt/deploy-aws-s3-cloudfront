@@ -80,7 +80,7 @@ describe('deploy', () => {
 
     expect.assertions(6);
 
-    return deploy(mockS3, 'foo', uploads, deletes, localPrefix, '', 'public-read', [ uploads[0] ]).then(({ uploaded }) => {
+    return deploy(mockS3, 'foo', uploads, deletes, localPrefix, '', 'public-read', { [ uploads[0] ]: 'no-cache' }).then(({ uploaded }) => {
 
       expect(mockS3.lastUploadParams.ACL).toBe('public-read');
       expect(mockS3.lastUploadParams.Body).toBeInstanceOf(fs.ReadStream);

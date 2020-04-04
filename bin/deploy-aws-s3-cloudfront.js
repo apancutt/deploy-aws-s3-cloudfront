@@ -27,6 +27,11 @@ const argv = yargs
     demand: true,
     describe: 'AWS S3 bucket name to deploy to',
   })
+  .option('cache-control', {
+    type: 'array',
+    describe: 'Set CacheControl values for S3 path(s)',
+    default: [],
+  })
   .option('delete', {
     type: 'boolean',
     describe: 'Delete files from AWS S3 that do not exist locally',
@@ -49,11 +54,6 @@ const argv = yargs
     type: 'string',
     describe: 'Set the invalidation path (URL-encoded if necessary) instead of automatically detecting objects to invalidate',
   })
-  .option('cache-control-no-cache', {
-    type: 'array',
-    describe: 'Disable caching of specified S3 path(s)',
-    default: [],
-  })
   .option('non-interactive', {
     type: 'boolean',
     describe: 'Do not prompt for confirmation',
@@ -75,7 +75,7 @@ const s3 = new AWS.S3();
 const cloudfront = new AWS.CloudFront();
 
 if (argv.react) {
-  argv.cacheControlNoCache.push('index.html');
+  argv.cacheControl.push('index.html:no-cache');
   argv.source = './build/';
 }
 
@@ -99,7 +99,7 @@ fetch(s3, argv.bucket, argv.source, argv.destination, argv.exclude)
 
   })
   .then(({ uploads, deletes }) => (
-    deploy(s3, argv.bucket, uploads, deletes, argv.source, argv.destination, argv.acl, argv.cacheControlNoCache)
+    deploy(s3, argv.bucket, uploads, deletes, argv.source, argv.destination, argv.acl, Object.fromEntries([ ...argv.cacheControl ].map((arg) => arg.split(':', 2))))
       .then(({ uploaded, deleted }) => {
 
         const changes = uploaded.concat(deleted);
