@@ -9,6 +9,7 @@
 const AWS = require('aws-sdk');
 const PromptConfirm = require('prompt-confirm');
 const yargs = require('yargs');
+require('polyfill-object.fromentries');
 
 const deploy = require('../src/deploy');
 const diff = require('../src/diff');
