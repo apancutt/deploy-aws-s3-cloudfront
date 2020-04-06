@@ -27,17 +27,17 @@
     "aws-sdk": "2",
     "colors": "1",
     "fast-glob": "3",
-    "md5-file": "4",
+    "md5-file": "5",
     "mime-types": "2",
-    "polyfill-object.fromentries": "^1.0.1",
+    "polyfill-object.fromentries": "1",
     "pretty-bytes": "5",
     "prompt-confirm": "2",
-    "yargs": "14"
+    "yargs": "15"
   },
   "devDependencies": {
     "babel-eslint": "10",
     "eslint": "6",
-    "jest": "^24.9.0"
+    "jest": "25"
   },
   "scripts": {
     "eslint": "eslint */**/*.js",
