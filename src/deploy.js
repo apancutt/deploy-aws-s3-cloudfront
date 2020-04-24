@@ -84,13 +84,13 @@ const deleteObjects = async (s3, bucket, keys, prefix = '') => {
 
 };
 
-module.exports = async (s3, bucket, uploads, deletes, localPrefix = '.', remotePrefix = '', acl = undefined, cacheControlNoCache = []) => {
+module.exports = async (s3, bucket, uploads, deletes, localPrefix = '.', remotePrefix = '', acl = undefined, cacheControl = {}) => {
 
   localPrefix = sanitizeFileSystemPrefix(localPrefix);
   remotePrefix = sanitizeS3Prefix(remotePrefix);
 
   return Promise.all([
-    uploadObjects(s3, bucket, uploads, localPrefix, remotePrefix, acl, cacheControlNoCache),
+    uploadObjects(s3, bucket, uploads, localPrefix, remotePrefix, acl, cacheControl),
     deleteObjects(s3, bucket, deletes, remotePrefix),
   ]).then(([ uploaded, deleted ]) => ({ uploaded, deleted }));
 
