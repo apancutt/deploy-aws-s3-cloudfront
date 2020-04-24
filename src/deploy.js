@@ -1,97 +1,67 @@
 const fs = require('fs');
-const mimeTypes = require('mime-types');
-const prettyBytes = require('pretty-bytes');
-const { info, warn } = require('./log');
-const { sanitizeFileSystemPrefix, sanitizeS3Prefix } = require('./utils');
 
 const DELETE_LIMIT = 1000; // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#deleteObjects-property
 
-const computeCacheControl = (path, cacheControl) => {
+const tagSet = (tags) => Object.entries(tags || {}).map(([ key, value ]) => ({ Key: key, Value: value }));
 
-  const match = Object.entries(cacheControl).find(([ cacheControlPath ]) => (
-    (cacheControlPath === path)
-    || (
-      cacheControlPath.endsWith('*')
-      && new RegExp(`^${cacheControlPath.replace(/\*?$/, '.*')}$`).test(path)
-    )
-  ));
+const upload = (s3, bucket, objects) => (
+  Promise.all(Object.entries(objects).map(([ , params ]) => s3.upload({
+    ACL: params.acl,
+    Body: fs.createReadStream(params.source),
+    Bucket: bucket,
+    CacheControl: params['cache-control'],
+    ContentLength: params['content-length'],
+    ContentType: params['content-type'],
+    Key: params.destination,
+    Tagging: {
+      TagSet: tagSet(params.tags),
+    },
+  }).promise()))
+);
 
-  return match && match[1];
-
+const hardDelete = (s3, bucket, objects) => {
+  objects = Object.entries(objects);
+  return Promise.all(
+    Array(Math.ceil(objects.length / DELETE_LIMIT))
+      .fill()
+      .map((_, index) => index * DELETE_LIMIT)
+      .map((start) => objects.slice(start, start + DELETE_LIMIT))
+      .map((batch) => s3.deleteObjects({
+        Bucket: bucket,
+        Delete: {
+          Objects: batch.map(([ , params ]) => ({ Key: params.destination })),
+        },
+      }).promise())
+  );
 };
 
-const uploadObjects = async (s3, bucket, keys, localPrefix = '.', remotePrefix = '', acl = undefined, cacheControl = {}) => {
+const softDelete = (s3, bucket, objects) => (
+  Promise.all(Object.entries(objects).map(([ , params ]) => s3.putObjectTagging({
+    Bucket: bucket,
+    Key: params.destination,
+    Tagging: {
+      TagSet: tagSet(params.tags),
+    },
+  }).promise()))
+);
 
-  const processed = [];
-  const promises = [];
+module.exports = (s3, payload, options) => {
 
-  keys.forEach((key) => {
+  const uploaded = {};
+  const deleted = {};
 
-    const localPath = localPrefix + key;
-    const remotePath = remotePrefix + key;
-    const type = mimeTypes.lookup(localPath) || 'application/octet-stream';
-    const stats = fs.statSync(localPath);
-    const stream = fs.createReadStream(localPath);
-    const computedCacheControl = computeCacheControl(remotePath, cacheControl);
-
-    stream.on('error', (err) => { throw err; });
-
-    info(`Uploading ${localPath} to s3://${bucket}/${remotePath} (${type} ${prettyBytes(stats.size)} CacheControl:${computedCacheControl || 'unset'})`);
-
-    processed.push(remotePath);
-
-    promises.push(s3.upload({
-      ACL: acl,
-      Body: stream,
-      Bucket: bucket,
-      CacheControl: computedCacheControl,
-      ContentLength: stats.size,
-      ContentType: type,
-      Key: remotePath,
-    }).promise());
-
+  Object.entries(payload).forEach(([ key, params ]) => {
+    if (params.source) {
+      uploaded[key] = params;
+    } else {
+      deleted[key] = params;
+    }
   });
 
-  return Promise.all(promises).then(() => processed);
-
-};
-
-const deleteObjects = async (s3, bucket, keys, prefix = '') => {
-
-  let processed = [];
-  const promises = [];
-  const remaining = keys.map((key) => prefix + key);
-
-  while (remaining.length) {
-
-    const batch = remaining.splice(0, DELETE_LIMIT);
-    processed = processed.concat(batch);
-
-    batch.forEach((remotePath) => {
-      warn(`Deleting s3://${bucket}/${remotePath}`);
-    });
-
-    promises.push(s3.deleteObjects({
-      Bucket: bucket,
-      Delete: {
-        Objects: batch.map((Key) => ({ Key })),
-      },
-    }).promise());
-
-  }
-
-  return Promise.all(promises).then(() => processed);
-
-};
-
-module.exports = async (s3, bucket, uploads, deletes, localPrefix = '.', remotePrefix = '', acl = undefined, cacheControl = {}) => {
-
-  localPrefix = sanitizeFileSystemPrefix(localPrefix);
-  remotePrefix = sanitizeS3Prefix(remotePrefix);
-
   return Promise.all([
-    uploadObjects(s3, bucket, uploads, localPrefix, remotePrefix, acl, cacheControl),
-    deleteObjects(s3, bucket, deletes, remotePrefix),
-  ]).then(([ uploaded, deleted ]) => ({ uploaded, deleted }));
+    upload(s3, options.bucket, uploaded).then(() => uploaded),
+    (options['soft-delete'] ? softDelete(s3, options.bucket, deleted) : hardDelete(s3, options.bucket, deleted)).then(() => deleted),
+  ])
+    .then(() => ({ uploaded, deleted }));
 
 };

@@ -7,112 +7,216 @@
  */
 
 const AWS = require('aws-sdk');
-const PromptConfirm = require('prompt-confirm');
 const yargs = require('yargs');
-require('polyfill-object.fromentries');
-
+const confirmDeploy = require('../src/confirm-deploy');
+const confirmInvalidate = require('../src/confirm-invalidate');
 const deploy = require('../src/deploy');
 const diff = require('../src/diff');
 const fetch = require('../src/fetch');
 const invalidate = require('../src/invalidate');
-const { fatal, info, warn } = require('../src/log');
+const { debug, fatal, warn } = require('../src/log');
+const payload = require('../src/payload');
+const softDeleteLifecycle = require('../src/soft-delete-lifecycle');
+const stale = require('../src/stale');
+const summarize = require('../src/summarize');
+const { sanitizeFileSystemPrefix, sanitizeS3Prefix } = require('../src/utils');
 
-const argv = yargs
+const options = yargs
   .usage('$0 [options]', 'Syncs a local directory to an AWS S3 bucket, optionally invalidating affected CloudFront paths.')
   .option('acl', {
-    type: 'string',
-    describe: 'A canned ACL string',
+    coerce: (arg) => arg.reduce((previous, current) => {
+      const [ pattern, value ] = current.split(':', 2);
+      return { ...previous, [pattern]: value };
+    }, {}),
+    default: [],
+    describe: 'Set canned ACL values for S3 path(s)',
+    requiresArg: true,
+    type: 'array',
   })
   .option('bucket', {
-    type: 'string',
     demand: true,
     describe: 'AWS S3 bucket name to deploy to',
+    type: 'string',
   })
   .option('cache-control', {
-    type: 'array',
-    describe: 'Set CacheControl values for S3 path(s)',
+    coerce: (arg) => arg.reduce((previous, current) => {
+      const [ pattern, value ] = current.split(':', 2);
+      return { ...previous, [pattern]: value };
+    }, {}),
     default: [],
+    describe: 'Set CacheControl values for S3 path(s)',
+    requiresArg: true,
+    type: 'array',
   })
   .option('delete', {
+    conflicts: 'soft-delete',
+    describe: 'Delete objects in AWS S3 that do not exist locally',
     type: 'boolean',
-    describe: 'Delete files from AWS S3 that do not exist locally',
-    default: false,
   })
   .option('destination', {
-    type: 'string',
     describe: 'Path to remote directory to sync to',
+    requiresArg: true,
+    type: 'string',
+    coerce: sanitizeS3Prefix,
   })
   .option('distribution', {
-    type: 'string',
     describe: 'AWS CloudFront distribution ID to invalidate',
+    requiresArg: true,
+    type: 'string',
   })
   .option('exclude', {
-    type: 'array',
-    describe: 'Patterns to exclude from deployment',
     default: [],
+    describe: 'Patterns to exclude from deployment',
+    requiresArg: true,
+    type: 'array',
   })
-  .option('invalidation-path', {
-    type: 'string',
-    describe: 'Set the invalidation path (URL-encoded if necessary) instead of automatically detecting objects to invalidate',
+  .option('invalidation-paths', {
+    describe: 'Set the invalidation path(s) (URL-encoded if necessary) instead of automatically detecting objects to invalidate',
+    requiresArg: true,
+    type: 'array',
   })
   .option('non-interactive', {
-    type: 'boolean',
-    describe: 'Do not prompt for confirmation',
     default: false,
+    describe: 'Do not prompt for confirmation',
+    type: 'boolean',
   })
   .option('react', {
-    type: 'boolean',
-    describe: 'Use recommended settings for create-react-apps and disable caching of index.html',
     default: false,
+    describe: 'Use recommended settings for create-react-apps',
+    type: 'boolean',
+  })
+  .option('soft-delete', {
+    conflicts: 'delete',
+    describe: 'Tag objects in AWS S3 that do not exist locally with "expired=true"',
+    type: 'boolean',
+  })
+  .option('soft-delete-lifecycle-expiration', {
+    default: 90,
+    describe: 'Number of days after creation that soft-deleted objects are removed',
+    requiresArg: true,
+    type: 'integer',
+  })
+  .option('soft-delete-lifecycle-id', {
+    default: 'Soft-Delete',
+    describe: 'ID of soft-delete lifecycle rule',
+    requiresArg: true,
+    type: 'string',
+  })
+  .option('soft-delete-lifecycle-tag-key', {
+    default: 'deleted',
+    describe: 'Tag key used to mark objects as soft-deleted',
+    requiresArg: true,
+    type: 'string',
+  })
+  .option('soft-delete-lifecycle-tag-value', {
+    default: 'true',
+    describe: 'Tag value used to mark objects as soft-deleted',
+    requiresArg: true,
+    type: 'string',
   })
   .option('source', {
-    type: 'string',
-    describe: 'Path to local directory to sync from',
+    coerce: sanitizeFileSystemPrefix,
     default: '.',
+    describe: 'Path to local directory to sync from',
+    requiresArg: true,
+    type: 'string',
+  })
+  .option('tags', {
+    coerce: (arg) => arg.reduce((previous, current) => {
+      const [ pattern, tags ] = current.split(':', 2);
+      return {
+        ...previous,
+        [pattern]: tags.split(',').reduce((accumulator, tag) => {
+          const [ key, value ] = tag.split('=', 2);
+          return {
+            ...accumulator,
+            [key]: value,
+          };
+        }, previous[pattern]),
+      };
+    }, {}),
+    describe: 'Tag set(s) to be applied to objects in AWS S3',
+    requiresArg: true,
+    type: 'array',
+  })
+  .middleware((options) => {
+    if (options.react) {
+      options['cache-control'] = {
+        ['index.html']: 'no-cache',
+        ...options['cache-control'],
+      };
+      options.source = './build/';
+    }
+  }, true)
+  .middleware((options) => {
+    if (options['delete']) {
+      options['soft-delete'] = false;
+    } else if (options['soft-delete']) {
+      options.delete = false;
+    } else {
+      options.delete = false;
+      options['soft-delete'] = false;
+    }
   })
   .argv;
 
 const s3 = new AWS.S3();
 const cloudfront = new AWS.CloudFront();
 
-if (argv.react) {
-  argv.cacheControl.push('index.html:no-cache');
-  argv.source = './build/';
-}
+s3.upload = (args) => {
+  args.Body = 'stream';
+  console.log('UPLOAD', JSON.stringify(args));
+  return { promise: () => Promise.resolve() };
+};
+s3.deleteObjects = (args) => {
+  console.log('HARD DELETE', JSON.stringify(args));
+  return { promise: () => Promise.resolve() };
+};
+s3.putObjectTagging = (args) => {
+  console.log('SOFT DELETE', JSON.stringify(args));
+  return { promise: () => Promise.resolve() };
+};
+cloudfront.createInvalidation = (args) => {
+  console.log('INVALIDATE', JSON.stringify(args));
+  return { promise: () => Promise.resolve() };
+};
 
-fetch(s3, argv.bucket, argv.source, argv.destination, argv.exclude)
-  .then(({ local, remote }) => diff(local, remote, !argv.delete))
-  .then(({ added, modified, deleted }) => {
+debug(`Fetching local objects from ${options.source}`);
+debug(`Fetching remote objects from s3://${options.bucket}/${options.destination}`);
 
-    const uploads = added.concat(modified);
-    const deletes = deleted;
-
-    return (!argv.nonInteractive && (uploads.length || deletes.length) ? new PromptConfirm('Continue deployment?').run() : Promise.resolve(true)).then((answer) => {
-
-      if (!answer) {
-        warn('Abandoning deployment');
-        return { uploads: [], deletes: [] };
-      }
-
-      return { uploads, deletes };
-
-    });
-
-  })
-  .then(({ uploads, deletes }) => (
-    deploy(s3, argv.bucket, uploads, deletes, argv.source, argv.destination, argv.acl, Object.fromEntries([ ...argv.cacheControl ].map((arg) => arg.split(':', 2))))
-      .then(({ uploaded, deleted }) => {
-
-        const changes = uploaded.concat(deleted);
-
-        if (!argv.distribution || !changes.length) {
-          return [];
+fetch(s3, options)
+  .then(({ local, remote }) => diff(local, remote))
+  .then(({ added, deleted, modified }) => payload(added, modified, deleted, options))
+  .then((payload) => (
+    confirmDeploy(payload, options)
+      .then((confirmed) => {
+        if (!confirmed) {
+          warn('Deployment aborted');
+          payload = {};
         }
-
-        return invalidate(cloudfront, argv.distribution, argv.invalidationPath ? [ argv.invalidationPath ] : changes, !argv.invalidationPath);
-
+        return payload;
       })
-      .then((invalidations) => ({ uploads, deletes, invalidations }))
   ))
-  .then(({ uploads, deletes, invalidations }) => info(`Deployment complete (${uploads.length} uploaded, ${deletes.length} deleted, ${invalidations.length} invalidated)`))
+  .then((payload) => (
+    options['soft-delete']
+      ? softDeleteLifecycle(s3, options).then(() => payload)
+      : payload
+  ))
+  .then((payload) => deploy(s3, payload, options))
+  .then(({ uploaded, deleted }) => stale(uploaded, deleted, options).then((stale) => ({ uploaded, deleted, stale }))
+  .then(({ uploaded, deleted, stale }) => (
+    confirmInvalidate(stale, options)
+      .then((confirmed) => {
+        if (!confirmed) {
+          warn('Invalidation aborted');
+          stale = [];
+        }
+        return { uploaded, deleted, stale };
+      })
+  ))
+  .then(({ uploaded, deleted, stale }) => (
+    invalidate(cloudfront, stale, options))
+      .then((invalidated) => ({ uploaded, deleted, invalidated }))
+  ))
+  .then(({ uploaded, deleted, invalidated }) => summarize(uploaded, deleted, invalidated, options))
   .catch((err) => fatal(err.message));

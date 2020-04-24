@@ -29,7 +29,6 @@
     "fast-glob": "3",
     "md5-file": "5",
     "mime-types": "2",
-    "polyfill-object.fromentries": "1",
     "pretty-bytes": "5",
     "prompt-confirm": "2",
     "yargs": "15"
