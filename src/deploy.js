@@ -1,4 +1,5 @@
 const fs = require('fs');
+const micromatch = require('micromatch');
 const mimeTypes = require('mime-types');
 const prettyBytes = require('pretty-bytes');
 const { info, warn } = require('./log');
@@ -8,12 +9,10 @@ const DELETE_LIMIT = 1000; // https://docs.aws.amazon.com/AWSJavaScriptSDK/lates
 
 const computeCacheControl = (path, cacheControl) => {
 
+  // more specific cache-control rules should come first, since .find() will stop at the first match
   const match = Object.entries(cacheControl).find(([ cacheControlPath ]) => (
-    (cacheControlPath === path)
-    || (
-      cacheControlPath.endsWith('*')
-      && new RegExp(`^${cacheControlPath.replace(/\*?$/, '.*')}$`).test(path)
-    )
+    // prepend forward slash to simulate root directory and enable globs like "/my_root_file.html"
+    micromatch.isMatch(`/${path}`, cacheControlPath)
   ));
 
   return match && match[1];
@@ -32,7 +31,7 @@ const uploadObjects = async (s3, bucket, keys, localPrefix = '.', remotePrefix =
     const type = mimeTypes.lookup(localPath) || 'application/octet-stream';
     const stats = fs.statSync(localPath);
     const stream = fs.createReadStream(localPath);
-    const computedCacheControl = computeCacheControl(remotePath, cacheControl);
+    const computedCacheControl = computeCacheControl(key, cacheControl);
 
     stream.on('error', (err) => { throw err; });
 
