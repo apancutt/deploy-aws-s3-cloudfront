@@ -11,8 +11,7 @@ const computeCacheControl = (path, cacheControl) => {
 
   // more specific cache-control rules should come first, since .find() will stop at the first match
   const match = Object.entries(cacheControl).find(([ cacheControlPath ]) => (
-    // prepend forward slash to simulate root directory and enable globs like "/my_root_file.html"
-    micromatch.isMatch(`/${path}`, cacheControlPath)
+    micromatch.isMatch(path, cacheControlPath)
   ));
 
   return match && match[1];

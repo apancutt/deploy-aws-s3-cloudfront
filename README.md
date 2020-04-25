@@ -33,7 +33,7 @@ Set CacheControl values for S3 path(s). Uses [micromatch](https://www.npmjs.com/
 # will apply first rule to index.html and second rule to all other files
 --cache-control "/index.html:no-cache" "**:max-age=604800"
 # will apply first rule to index.html, second to all .svg files and last rule to all other files
-  --cache-control "/index.html:no-cache" "**/*.svg:max-age=31536000" "**:max-age=604800"
+  --cache-control "/index.html:no-cache" "**.svg:max-age=31536000" "**:max-age=604800"
 ```
 
 #### `--delete`
