@@ -1,42 +1,29 @@
 const INVALIDATION_LIMIT = 3000; // https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Invalidation.html#InvalidationLimits
 
-const sanitize = (key, allowAsterix = false) => {
+module.exports = (cloudfront, objects, options) => {
 
-  key = encodeURIComponent(key)
-    .replace(/~/g, '%7E')
-    .replace(/!/g, '%21')
-    .replace(/'/g, '%27')
-    .replace(/\(/g, '%28')
-    .replace(/\)/g, '%29')
-    .replace(/%2F/g, '/') // Restore slashes
-
-  if (!allowAsterix) {
-    key = key.replace(/\*/g, '%2A');
+  if (!options.distribution) {
+    return Promise.resolve([]);
   }
 
-  if (!key.startsWith('/')) {
-    key = `/${key}`;
-  }
+  const urls = options.invalidationPaths.length ? options.invalidationPaths : objects.map((object) => object.path.cloudfront);
 
-  return key;
+  return Promise.all(
+    Array(Math.ceil(urls.length / INVALIDATION_LIMIT))
+      .fill()
+      .map((_, index) => index * INVALIDATION_LIMIT)
+      .map((start) => urls.slice(start, start + INVALIDATION_LIMIT))
+      .map((urls) => cloudfront.createInvalidation({
+        DistributionId: options.distribution,
+        InvalidationBatch: {
+          CallerReference: `${+new Date()}`,
+          Paths: {
+            Items: urls,
+            Quantity: urls.length,
+          },
+        },
+      }).promise())
+  )
+    .then(() => urls);
 
 };
-
-module.exports = (cloudfront, stale, options) => Promise.all(
-  Array(Math.ceil(stale.length / INVALIDATION_LIMIT))
-    .fill()
-    .map((_, index) => index * INVALIDATION_LIMIT)
-    .map((start) => stale.slice(start, start + INVALIDATION_LIMIT))
-    .map((batch) => sanitize(batch, !!options['invalidation-paths'].length))
-    .map((batch) => cloudfront.createInvalidation({
-      DistributionId: options.distribution,
-      InvalidationBatch: {
-        CallerReference: `${+new Date()}`,
-        Paths: {
-          Items: batch,
-          Quantity: batch.length,
-        },
-      },
-    }).promise())
-)
-  .then(() => stale);

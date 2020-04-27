@@ -1,9 +1,8 @@
-const { debug, info } = require('./log');
-
-module.exports = (uploaded, deleted, invalidated, options) => {
-  info('Deployment complete')
-  debug(`Uploaded: ${Object.keys(uploaded).length}`);
-  debug(`${options['soft-delete'] ? 'Soft Deleted' : 'Deleted'}: ${Object.keys(deleted).length}`);
-  debug(`Invalidated: ${invalidated.length}`);
+module.exports = (logger, added, modified, deleted, invalidated, options) => {
+  logger.info('Deployment complete')
+  logger.debug(`Added: ${added.length}`);
+  logger.debug(`Modified: ${modified.length}`);
+  logger.debug(`${'soft' === options.delete ? 'Soft Deleted' : 'Hard Deleted'}: ${deleted.length}`);
+  logger.debug(`Invalidated: ${invalidated.length}`);
   return Promise.resolve();
 };
