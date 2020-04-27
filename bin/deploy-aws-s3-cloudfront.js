@@ -7,6 +7,7 @@
  */
 
 const AWS = require('aws-sdk');
+const path = require('path');
 const yargs = require('yargs');
 const confirmDeploy = require('../src/confirm-deploy');
 const confirmInvalidate = require('../src/confirm-invalidate');
@@ -19,7 +20,6 @@ const payload = require('../src/payload');
 const softDeleteLifecycle = require('../src/soft-delete-lifecycle');
 const stale = require('../src/stale');
 const summarize = require('../src/summarize');
-const { sanitizeFileSystemPrefix, sanitizeS3Prefix } = require('../src/utils');
 
 const options = yargs
   .usage('$0 [options]', 'Syncs a local directory to an AWS S3 bucket, optionally invalidating affected CloudFront paths.')
@@ -57,7 +57,13 @@ const options = yargs
     describe: 'Path to remote directory to sync to',
     requiresArg: true,
     type: 'string',
-    coerce: sanitizeS3Prefix,
+    coerce: (arg) => {
+      arg = arg.replace(/^\//g, '');
+      if (arg && !arg.endsWith('/')) {
+        arg = `${arg}/`;
+      }
+      return arg;
+    },
   })
   .option('distribution', {
     describe: 'AWS CloudFront distribution ID to invalidate',
@@ -115,7 +121,15 @@ const options = yargs
     type: 'string',
   })
   .option('source', {
-    coerce: sanitizeFileSystemPrefix,
+    coerce: (arg) => {
+      if (!path.isAbsolute(arg)) {
+        arg = path.resolve(arg);
+      }
+      if (!arg.endsWith('/')) {
+        arg += '/';
+      }
+      return arg;
+    },
     default: '.',
     describe: 'Path to local directory to sync from',
     requiresArg: true,
