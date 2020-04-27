@@ -1,4 +1,5 @@
 const fs = require('fs');
+const micromatch = require('micromatch');
 const mimeTypes = require('mime-types');
 
 const commonParams = (key, destination, tags) => ({
@@ -7,36 +8,18 @@ const commonParams = (key, destination, tags) => ({
 });
 
 const aclValue = (key, acls) => {
-  const match = Object.entries(acls).find(([ pattern ]) => (
-    (pattern === key)
-    || (
-      pattern.endsWith('*')
-      && new RegExp(`^${pattern.replace(/\*?$/, '.*')}$`).test(key)
-    )
-  ));
+  const match = Object.entries(acls).find(([ pattern ]) => micromatch.isMatch(key, pattern));
   return match && match[1];
 };
 
 const cacheControlValue = (key, cacheControls) => {
-  const match = Object.entries(cacheControls).find(([ pattern ]) => (
-    (pattern === key)
-    || (
-      pattern.endsWith('*')
-      && new RegExp(`^${pattern.replace(/\*?$/, '.*')}$`).test(key)
-    )
-  ));
+  const match = Object.entries(cacheControls).find(([ pattern ]) => micromatch.isMatch(key, pattern));
   return match && match[1];
 };
 
 const tagsValue = (key, tags) => (
   Object.entries(tags)
-    .filter(([ pattern ]) => (
-      (pattern === key)
-      || (
-        pattern.endsWith('*')
-        && new RegExp(`^${pattern.replace(/\*?$/, '.*')}$`).test(key)
-      )
-    ))
+    .filter(([ pattern ]) => micromatch.isMatch(key, pattern))
     .reduce((accumulator, [ , tags ]) => ({
       ...accumulator,
       ...tags,
