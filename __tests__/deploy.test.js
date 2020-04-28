@@ -14,10 +14,10 @@ describe('deploy', () => {
     contentLength: 21,
     contentType: 'text/plain',
     path: {
-      cloudFront: '/local.txt',
+      cloudFront: '/test/local.txt',
       local: `${options.source}local.txt`,
       relative: 'local.txt',
-      s3: 'local.txt',
+      s3: 'test/local.txt',
     },
     tagSet: [],
   }];
@@ -28,10 +28,10 @@ describe('deploy', () => {
     contentLength: undefined,
     contentType: undefined,
     path: {
-      cloudFront: '/remote.txt',
+      cloudFront: '/test/remote.txt',
       local: `${options.source}remote.txt`,
       relative: 'remote.txt',
-      s3: 'remote.txt',
+      s3: 'test/remote.txt',
     },
     tagSet: [],
   }];
@@ -42,10 +42,10 @@ describe('deploy', () => {
     contentLength: 24,
     contentType: 'text/plain',
     path: {
-      cloudFront: '/modified.txt',
+      cloudFront: '/test/modified.txt',
       local: `${options.source}modified.txt`,
       relative: 'modified.txt',
-      s3: 'modified.txt',
+      s3: 'test/modified.txt',
     },
     tagSet: [],
   }];
