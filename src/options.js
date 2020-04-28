@@ -72,6 +72,13 @@ module.exports = yargs
     describe: 'Do not prompt for confirmation',
     type: 'boolean',
   })
+  .option('output-format', {
+    choices: [ 'colors', 'json', 'text' ],
+    default: 'colors',
+    describe: 'Set the format for logging',
+    requiresArg: true,
+    type: 'string',
+  })
   .option('react', {
     default: false,
     describe: 'Use recommended settings for create-react-apps',

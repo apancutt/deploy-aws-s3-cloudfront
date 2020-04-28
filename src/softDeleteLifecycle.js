@@ -1,4 +1,4 @@
-const createLifecycle = (s3, options, previous = {}) => (
+const createLifecycle = (logger, s3, options, previous = {}) => (
   s3.putBucketLifecycleConfiguration({
     Bucket: options.bucket,
     LifecycleConfiguration: {
@@ -22,23 +22,33 @@ const createLifecycle = (s3, options, previous = {}) => (
     }
   })
     .promise()
-    .then(() => options.softDeleteLifeCycleId)
+    .then(() => {
+      logger.debug(`Lifecycle rule for soft-deletion created`, {
+        expiration: options.softDeleteLifecycleExpiration,
+        id: options.softDeleteLifecycleId,
+        tagKey: options.softDeleteLifecycleTagKey,
+        tagValue: options.softDeleteLifecycleTagValue,
+      });
+    })
 );
 
-module.exports = (s3, deleted, options) => (!options.softDelete || !deleted.length) ? Promise.resolve() : (
+module.exports = (logger, s3, deleted, options) => (!options.softDelete || !deleted.length) ? Promise.resolve() : (
   s3.getBucketLifecycleConfiguration({ Bucket: options.bucket })
     .promise()
     .then((config) => {
       if (config.Rules.find((rule) => options.softDeleteLifecycleId === rule.ID)) {
+        logger.debug('Lifecycle rule for soft-deletion already exists', {
+          id: options.softDeleteLifecycleId,
+        });
         return;
       }
-      return createLifecycle(s3, options, config);
+      return createLifecycle(logger, s3, options, config);
     })
     .catch((err) => {
       if (!err || 'NoSuchLifecycleConfiguration' !== err.code) {
         return Promise.reject(err);
       }
-      return createLifecycle(s3, options);
+      return createLifecycle(logger, s3, options);
     })
 );
 

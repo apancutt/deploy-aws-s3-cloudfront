@@ -4,13 +4,22 @@ const md5File = require('md5-file');
 const micromatch = require('micromatch');
 const mimeTypes = require('mime-types');
 
-const localNames = (options) => fastGlob('**', {
-  cwd: options.source,
-  dot: true,
-  ignore: options.exclude,
-});
+const localNames = (logger, options) => {
 
-const remoteNamesAndChecksums = (s3, options) => {
+  logger.debug('Fetching local files...', {
+    source: options.source,
+    ignore: options.exclude,
+  });
+
+  return fastGlob('**', {
+    cwd: options.source,
+    dot: true,
+    ignore: options.exclude,
+  });
+
+};
+
+const remoteNamesAndChecksums = (logger, s3, options) => {
 
   const prefix = options.destination.replace(/^\//, '');
   const keyToRelativePath = (key) => prefix ? key.replace(new RegExp(`^${prefix}`), '') : key;
@@ -37,6 +46,11 @@ const remoteNamesAndChecksums = (s3, options) => {
       })
   );
 
+  logger.debug('Fetching remote objects...', {
+    bucket: options.bucket,
+    prefix: options.destination
+  });
+
   return fetch();
 
 }
@@ -60,7 +74,7 @@ const info = (name, deleted, options) => {
       relative: name,
       local: options.source + name,
       s3: options.destination.replace(/^\//, '') + name,
-      cloudfront: encodeURIComponent(options.destination + name)
+      cloudFront: encodeURIComponent(options.destination + name)
         .replace(/~/g, '%7E')
         .replace(/!/g, '%21')
         .replace(/'/g, '%27')
@@ -84,19 +98,68 @@ const info = (name, deleted, options) => {
 
 };
 
-module.exports = (s3, options) => Promise.all([
-  localNames(options),
-  remoteNamesAndChecksums(s3, options),
+const exists = (logger, name, localNames, remoteNamesAndChecksums) => {
+
+  const locally = localNames.includes(name);
+  const remotely = name in remoteNamesAndChecksums;
+
+  if (locally && remotely) {
+    logger.debug(`${name} exists locally and remotely`);
+  } else if (locally) {
+    logger.debug(`${name} exists locally only`);
+  } else {
+    logger.debug(`${name} exists remotely only`);
+  }
+
+  return { locally, remotely };
+
+};
+
+const differ = (logger, name, localChecksum, remoteChecksum) => {
+
+  if (localChecksum === remoteChecksum) {
+    logger.debug(`${name} checksums match`, {
+      local: localChecksum,
+      remote: remoteChecksum,
+    });
+    return false;
+  }
+
+  logger.debug(`${name} checksums differ`, {
+    local: localChecksum,
+    remote: remoteChecksum,
+  });
+
+  return true;
+
+};
+
+module.exports = (logger, s3, options) => Promise.all([
+  localNames(logger, options),
+  remoteNamesAndChecksums(logger, s3, options),
 ])
-  .then(([ localNames, remoteNamesAndChecksums ]) => ({
-    added: localNames
-      .filter((name) => !(name in remoteNamesAndChecksums))
-      .map((name) => info(name, false, options)),
-    modified: localNames
-      .filter((name) => name in remoteNamesAndChecksums)
-      .filter((name) => md5File.sync(options.source + name) !== remoteNamesAndChecksums[name])
-      .map((name) => info(name, false, options)),
-    deleted: !options.delete ? [] : Object.keys(remoteNamesAndChecksums)
-      .filter((name) => !localNames.includes(name))
-      .map((name) => info(name, true, options)),
-  }));
+  .then(([ localNames, remoteNamesAndChecksums ]) => {
+
+    const added = [];
+    const modified = [];
+    const deleted = [];
+
+    localNames.concat(Object.keys(remoteNamesAndChecksums)).forEach((name) => {
+
+      const existence = exists(logger, name, localNames, remoteNamesAndChecksums);
+
+      if (!existence.remotely) {
+        added.push(info(name, false, options));
+      } else if (!existence.locally) {
+        if (options.delete) {
+          deleted.push(info(name, true, options));
+        }
+      } else if (differ(logger, name, md5File.sync(options.source + name), remoteNamesAndChecksums[name])) {
+        modified.push(info(name, false, options))
+      }
+
+    });
+
+    return { added, deleted, modified };
+
+  });
