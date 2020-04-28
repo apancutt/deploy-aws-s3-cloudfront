@@ -81,7 +81,7 @@ module.exports = yargs
   })
   .option('output-format', {
     choices: [ 'json', 'pretty', 'text' ],
-    default: 'pretty',
+    default: 'text',
     describe: 'Logging output format.',
     requiresArg: true,
     type: 'string',

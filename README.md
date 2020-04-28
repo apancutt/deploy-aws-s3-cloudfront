@@ -96,7 +96,7 @@ Logging output format.
 
 Accepted formats are: `text`, `json` or `pretty`.
 
-Default: `pretty`
+Default: `text`
 
 #### `--react`
 
