@@ -20,28 +20,6 @@ const softDeleteLifecycle = require('../src/softDeleteLifecycle');
 const stale = require('../src/stale');
 const summarize = require('../src/summarize');
 
-s3.upload = (args) => {
-  args.Body = 'stream';
-  console.log('UPLOAD', JSON.stringify(args));
-  return { promise: () => Promise.resolve() };
-};
-s3.deleteObjects = (args) => {
-  console.log('HARD DELETE', JSON.stringify(args));
-  return { promise: () => Promise.resolve() };
-};
-s3.putObjectTagging = (args) => {
-  console.log('SOFT DELETE', JSON.stringify(args));
-  return { promise: () => Promise.resolve() };
-};
-s3.putBucketLifecycleConfiguration = (args) => {
-  console.log('LIFECYCLE', JSON.stringify(args));
-  return { promise: () => Promise.resolve() };
-};
-cloudFront.createInvalidation = (args) => {
-  console.log('INVALIDATE', JSON.stringify(args));
-  return { promise: () => Promise.resolve() };
-};
-
 changeset(logger, s3, options)
   .then(({ added, deleted, modified }) => deployConfirmation(logger, added, modified, deleted, options))
   .then(({ added, deleted, modified }) => (
