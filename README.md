@@ -186,7 +186,7 @@ Patterns should be relative (without a leading slash) to the source directory an
 
 Objects can be soft-deleted using an [S3 Object Lifecycle](https://docs.aws.amazon.com/AmazonS3/latest/dev/object-lifecycle-mgmt.html) expiration rule.
 
-This feature can be enabled using the `--soft-delete` option. When enabled, objects are not deleted from S3 but are instead tagged for later removal by a lifecycle rule. The lifecycle rule is created automatically if one with the same `--soft-delete-lifecycle-id` (default is `Soft-Delete`) does not exist.
+This feature can be enabled using the `--soft-delete` option. When enabled, objects are not deleted from S3 but are instead tagged for later removal by a lifecycle rule. The lifecycle rule is created automatically if one with the same `--soft-delete-lifecycle-id` does not exist (default is `Soft-Delete`).
 
 The installed rule will automatically delete objects that are both tagged for deletion and have expired. The expiration time is relative to the object creation date, in days.
 
