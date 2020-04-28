@@ -213,7 +213,7 @@ In this example, the expiration is set to 90 days and the object was tagged for 
 
 ## React Apps
 
-Pass the `--react` option when deploying apps created using `create-react-app`. This is shortcut for `deploy-aws-s3-cloudfront --source ./build/ --cache-control index.html:no-cache`.
+Use the `--react` option when deploying apps created using `create-react-app`. This is shortcut for `deploy-aws-s3-cloudfront --source ./build/ --cache-control index.html:no-cache`.
 
 ## Alternatives
 
