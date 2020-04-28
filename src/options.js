@@ -12,13 +12,13 @@ module.exports = yargs
       return { ...previous, [pattern]: value };
     }, {}),
     default: [],
-    describe: 'Set canned ACL values for S3 path(s)',
+    describe: 'Apply ACL to specific pattern(s).',
     requiresArg: true,
     type: 'array',
   })
   .option('bucket', {
     demand: true,
-    describe: 'AWS S3 bucket name to deploy to',
+    describe: 'AWS S3 bucket name to deploy to.',
     requiresArg: true,
     type: 'string',
   })
@@ -28,13 +28,13 @@ module.exports = yargs
       return { ...previous, [pattern]: value };
     }, {}),
     default: [],
-    describe: 'Set CacheControl values for S3 path(s)',
+    describe: 'Apply Cache Control to specific pattern(s).',
     requiresArg: true,
     type: 'array',
   })
   .option('delete', {
     default: false,
-    describe: 'Delete objects in AWS S3 that do not exist locally',
+    describe: 'Delete objects in AWS S3 that do not exist locally. Objects are retained if both this option and soft-delete are omitted.',
     type: 'boolean',
   })
   .option('destination', {
@@ -48,70 +48,70 @@ module.exports = yargs
       return arg;
     },
     default: '/',
-    describe: 'Path to remote directory to sync to',
+    describe: 'Path to remote directory to sync to.',
     requiresArg: true,
     type: 'string',
   })
   .option('distribution', {
-    describe: 'AWS CloudFront distribution ID to invalidate',
+    describe: 'AWS CloudFront distribution ID to invalidate. No invalidation is performed if this option is omitted.',
     requiresArg: true,
     type: 'string',
   })
   .option('exclude', {
     default: [],
-    describe: 'Patterns to exclude from deployment',
+    describe: 'Pattern(s) to exclude from deployment.',
     requiresArg: true,
     type: 'array',
   })
   .option('invalidation-path', {
     default: [],
-    describe: 'Set the invalidation path(s) instead of automatically detecting objects to invalidate',
+    describe: 'Set the invalidation path(s) instead of automatically detecting objects to invalidate. Paths should be relative to the root of the distribution.',
     requiresArg: true,
     type: 'array',
   })
   .option('non-interactive', {
     default: false,
-    describe: 'Do not prompt for confirmation',
+    describe: 'Do not prompt for confirmations.',
     type: 'boolean',
   })
   .option('output-format', {
     choices: [ 'json', 'pretty', 'text' ],
     default: 'pretty',
-    describe: 'Set the format for logging',
+    describe: 'Logging output format.',
     requiresArg: true,
     type: 'string',
   })
   .option('react', {
     default: false,
-    describe: 'Use recommended settings for create-react-apps',
+    describe: 'Use recommended settings for React applications.',
     type: 'boolean',
   })
   .option('soft-delete', {
     default: false,
-    describe: 'Soft-delete objects in AWS S3 that do not exist locally by tagging them for expiration using a lifecycle policy',
+    describe: 'Tag objects in AWS S3 that do not exist locally. Objects are retained if both this option and delete are omitted.',
     type: 'boolean',
   })
   .option('soft-delete-lifecycle-expiration', {
     default: 90,
-    describe: 'Number of days after creation that soft-deleted objects are removed',
+    describe: 'Expiration (in days) rule for generated soft-deletion lifecycle policy.',
     requiresArg: true,
     type: 'integer',
   })
   .option('soft-delete-lifecycle-id', {
     default: 'Soft-Delete',
-    describe: 'ID of soft-delete lifecycle rule',
+    describe: 'ID for generated soft-deletion lifecycle policy.',
     requiresArg: true,
     type: 'string',
   })
   .option('soft-delete-lifecycle-tag-key', {
     default: 'deleted',
-    describe: 'Tag key used to mark objects as soft-deleted',
+    describe: 'Key used for generated soft-deletion lifecycle policy tag.',
     requiresArg: true,
     type: 'string',
   })
   .option('soft-delete-lifecycle-tag-value', {
     default: 'true',
-    describe: 'Tag value used to mark objects as soft-deleted',
+    describe: 'Value used for generated soft-deletion lifecycle policy tag.',
     requiresArg: true,
     type: 'string',
   })
@@ -126,7 +126,7 @@ module.exports = yargs
       return arg;
     },
     default: '.',
-    describe: 'Path to local directory to sync from',
+    describe: 'Path to local directory to sync from.',
     requiresArg: true,
     type: 'string',
   })
@@ -145,13 +145,13 @@ module.exports = yargs
       };
     }, {}),
     default: [],
-    describe: 'Tag set(s) to be applied to objects in AWS S3',
+    describe: 'Apply tags to specific pattern(s).',
     requiresArg: true,
     type: 'array',
   })
   .option('verbose', {
     default: false,
-    describe: 'Show debug information',
+    describe: 'Enable verbose logging.',
     type: 'boolean',
   })
   .middleware((options) => {

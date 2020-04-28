@@ -26,15 +26,21 @@ See the [Using Patterns](#using-patterns) section for pattern usage.
 
 See https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#upload-property for accepted values.
 
+Default: `[]`
+
 #### `--bucket <name>` (required)
 
 AWS S3 bucket name to deploy to.
+
+Default: `undefined`
 
 #### `--cache-control <pattern>:<value> [<pattern>:<value>...]`
 
 Apply Cache Control to specific pattern(s).
 
 See the [Using Patterns](#using-patterns) section for pattern usage.
+
+Default: `[]`
 
 #### `--delete`
 
@@ -52,19 +58,25 @@ Default: `/`
 
 AWS CloudFront distribution ID to invalidate. No invalidation is performed if this option is omitted.
 
+Default: `undefined`
+
 #### `--exclude <pattern> [<pattern>...]`
 
 Pattern(s) to exclude from deployment.
 
 See the [Using Patterns](#using-patterns) section for pattern usage.
 
+Default: `[]`
+
 #### `--invalidation-path <path> [<path>...]`
 
-Set the invalidation path(s) instead of automatically detecting objects to invalidate.
+Set the invalidation path(s) instead of automatically detecting objects to invalidate. Paths should be relative to the root of the distribution.
 
 This option is typically used to reduce [invalidation costs](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Invalidation.html#PayingForInvalidation) by using a wildcard pattern (e.g. `--invalidation-path "/*"`).
 
 Special characters should be URL-encoded where necessary.
+
+Default: `[]`
 
 #### `--non-interactive`
 
@@ -139,6 +151,8 @@ Default: `.`
 Apply tags to specific pattern(s).
 
 See the [Using Patterns](#using-patterns) section for pattern usage.
+
+Default: `[]`
 
 #### `--verbose`
 
