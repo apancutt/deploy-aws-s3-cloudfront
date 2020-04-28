@@ -15,7 +15,7 @@ const upload = (logger, s3, objects, options) => Promise.all(objects.map((object
     ContentLength: object.contentLength,
     ContentType: object.contentType,
     Key: object.path.s3,
-    Tagging: qs.stringify(object.tagSet),
+    Tagging: qs.stringify(object.tagSet) || undefined,
   }).promise();
 
 }));
