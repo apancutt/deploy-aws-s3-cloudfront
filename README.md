@@ -44,7 +44,7 @@ Default: `[]`
 
 #### `--debug`
 
-Enable output of debug log messages.
+Enable output of debugging log messages.
 
 Default: `false`
 

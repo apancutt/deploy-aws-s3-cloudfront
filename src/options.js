@@ -34,7 +34,7 @@ module.exports = yargs
   })
   .option('debug', {
     default: false,
-    describe: 'Enable output of debug log messages.',
+    describe: 'Enable output of debugging log messages.',
     type: 'boolean',
   })
   .option('delete', {
