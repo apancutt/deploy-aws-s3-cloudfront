@@ -15,7 +15,7 @@ module.exports = (logger, added, modified, deleted, options) => {
   });
 
   return Promise.resolve(
-    (!options['non-interactive'] && (added.length || modified.length || deleted.length))
+    (!options.nonInteractive && (added.length || modified.length || deleted.length))
       ? (new PromptConfirm('Proceed with deployment?')).run()
       : true
   )

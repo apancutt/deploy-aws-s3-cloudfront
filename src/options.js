@@ -154,9 +154,9 @@ module.exports = yargs
   })
   .middleware((options) => {
     if (options.react) {
-      options['cache-control'] = {
+      options.cacheControl = {
         'index.html': 'no-cache',
-        ...options['cache-control'],
+        ...options.cacheControl,
       };
       options.source = './build/';
     }

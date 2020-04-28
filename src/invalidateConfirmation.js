@@ -7,7 +7,7 @@ module.exports = (logger, paths, options) => {
   });
 
   return Promise.resolve(
-    (!options['non-interactive'] && paths.length)
+    (!options.nonInteractive && paths.length)
       ? (new PromptConfirm('Proceed with invalidation?')).run()
       : true
   )
