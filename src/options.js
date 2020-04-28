@@ -172,5 +172,4 @@ module.exports = yargs
     } catch (err) {
       return 'Source must be a path to a directory';
     }
-  })
-  .argv;
+  });

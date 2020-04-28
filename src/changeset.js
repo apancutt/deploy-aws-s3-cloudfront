@@ -144,21 +144,24 @@ module.exports = (logger, s3, options) => Promise.all([
     const modified = [];
     const deleted = [];
 
-    localNames.concat(Object.keys(remoteNamesAndChecksums)).forEach((name) => {
+    localNames
+      .concat(Object.keys(remoteNamesAndChecksums))
+      .filter((element, index, array) => array.indexOf(element) === index)
+      .forEach((name) => {
 
-      const existence = exists(logger, name, localNames, remoteNamesAndChecksums);
+        const existence = exists(logger, name, localNames, remoteNamesAndChecksums);
 
-      if (!existence.remotely) {
-        added.push(info(name, false, options));
-      } else if (!existence.locally) {
-        if (options.delete) {
-          deleted.push(info(name, true, options));
+        if (!existence.remotely) {
+          added.push(info(name, false, options));
+        } else if (!existence.locally) {
+          if (options.delete || options.softDelete) {
+            deleted.push(info(name, true, options));
+          }
+        } else if (differ(logger, name, md5File.sync(options.source + name), remoteNamesAndChecksums[name])) {
+          modified.push(info(name, false, options))
         }
-      } else if (differ(logger, name, md5File.sync(options.source + name), remoteNamesAndChecksums[name])) {
-        modified.push(info(name, false, options))
-      }
 
-    });
+      });
 
     return { added, deleted, modified };
 

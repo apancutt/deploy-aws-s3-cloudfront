@@ -6,7 +6,7 @@
  * directory of this source tree.
  */
 
-const options = require('../src/options');
+const options = require('../src/options').argv
 
 const changeset = require('../src/changeset');
 const cloudFront = require('../src/s3')();

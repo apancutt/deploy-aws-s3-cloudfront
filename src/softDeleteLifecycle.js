@@ -29,7 +29,8 @@ const createLifecycle = (logger, s3, options, previous = {}) => {
       ],
     }
   })
-    .promise();
+    .promise()
+    .then(() => options.softDeleteLifecycleId);
 
 };
 
