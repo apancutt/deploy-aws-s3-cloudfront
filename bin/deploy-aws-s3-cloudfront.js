@@ -9,7 +9,7 @@
 const options = require('../src/options').argv
 
 const changeset = require('../src/changeset');
-const cloudFront = require('../src/s3')();
+const cloudFront = require('../src/cloudFront')();
 const deploy = require('../src/deploy');
 const deployConfirmation = require('../src/deployConfirmation');
 const invalidate = require('../src/invalidate');
