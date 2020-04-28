@@ -16,16 +16,12 @@ const invalidate = require('../src/invalidate');
 const invalidateConfirmation = require('../src/invalidateConfirmation');
 const logger = require('../src/logger')(options);
 const s3 = require('../src/s3')();
-const softDeleteLifecycle = require('../src/softDeleteLifecycle');
 const stale = require('../src/stale');
 const summarize = require('../src/summarize');
 
 changeset(logger, s3, options)
   .then(({ added, deleted, modified }) => deployConfirmation(logger, added, modified, deleted, options))
-  .then(({ added, deleted, modified }) => (
-    softDeleteLifecycle(logger, s3, deleted, options)
-      .then(() => deploy(logger, s3, added, modified, deleted, options))
-  ))
+  .then(({ added, deleted, modified }) => deploy(logger, s3, added, modified, deleted, options))
   .then(({ added, deleted, modified }) => (
     stale(modified, deleted, options)
       .then((stale) => invalidateConfirmation(logger, stale, options))

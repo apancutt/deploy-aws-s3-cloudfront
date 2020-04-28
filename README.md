@@ -114,22 +114,6 @@ See the [Soft-Deleting Objects](#soft-deleting-objects-experimental) section for
 
 Default: `false`
 
-#### `--soft-delete-lifecycle-expiration <expiration>`
-
-Expiration (in days) rule for generated soft-deletion lifecycle policy.
-
-See the [Soft-Deleting Objects](#soft-deleting-objects-experimental) section for more information.
-
-Default: `90`
-
-#### `--soft-delete-lifecycle-id <ID>`
-
-ID for generated soft-deletion lifecycle policy.
-
-See the [Soft-Deleting Objects](#soft-deleting-objects-experimental) section for more information.
-
-Default: `Soft-Delete`
-
 #### `--soft-delete-lifecycle-tag-key <key>`
 
 Key used for generated soft-deletion lifecycle policy tag.
@@ -186,7 +170,7 @@ Patterns should be relative (without a leading slash) to the source directory an
 
 Objects can be soft-deleted using an [S3 Object Lifecycle](https://docs.aws.amazon.com/AmazonS3/latest/dev/object-lifecycle-mgmt.html) expiration rule.
 
-This feature can be enabled using the `--soft-delete` option. When enabled, objects are not deleted from S3 but are instead tagged for later removal by a lifecycle rule. The lifecycle rule is created automatically if one with the same `--soft-delete-lifecycle-id` does not exist (default is `Soft-Delete`).
+This feature can be enabled using the `--soft-delete` option. When enabled, objects are not deleted from S3 but are instead tagged for later removal by a lifecycle rule. The lifecycle rule is created using the `create-soft-delete-lifecycle` tool (usage below).
 
 The installed rule will automatically delete objects that are both tagged for deletion and have expired. The expiration time is relative to the object creation date, in days.
 
@@ -210,6 +194,62 @@ Created                                     Deleted
 ```
 
 In this example, the expiration is set to 90 days and the object was tagged for soft-deletion 110 days after creation. It will be deleted immediately.
+
+### Usage
+
+    create-soft-delete-lifecycle --bucket <bucket> [options]
+
+### Options
+
+#### `--bucket <name>` (required)
+
+AWS S3 bucket name to deploy to.
+
+Default: `undefined`
+
+#### `--debug`
+
+Enable output of debugging log messages.
+
+Default: `false`
+
+#### `--non-interactive`
+
+Do not prompt for confirmations.
+
+Default: `false`
+
+#### `--output-format <format>`
+
+Logging output format.
+
+Accepted formats are: `colorized`, `json` or `text`.
+
+Default: `text`
+
+#### `--soft-delete-lifecycle-expiration <expiration>`
+
+Expiration (in days) rule for generated soft-deletion lifecycle policy.
+
+Default: `90`
+
+#### `--soft-delete-lifecycle-id <ID>`
+
+ID for generated soft-deletion lifecycle policy.
+
+Default: `Soft-Delete`
+
+#### `--soft-delete-lifecycle-tag-key <key>`
+
+Key used for generated soft-deletion lifecycle policy tag.
+
+Default: `deleted`
+
+#### `--soft-delete-lifecycle-tag-value <value>`
+
+Value used for generated soft-deletion lifecycle policy tag.
+
+Default: `true`
 
 ## React Apps
 

@@ -29,17 +29,19 @@ const createLifecycle = (logger, s3, options, previous = {}) => {
     }
   })
     .promise()
-    .then(() => options.softDeleteLifecycleId);
+    .then(() => {
+      logger.info(`Soft-delete lifecycle rule created on s3://${options.bucket} named "${options.softDeleteLifecycleId}"`);
+      return options.softDeleteLifecycleId;
+    });
 
 };
 
-module.exports = (logger, s3, deleted, options) => (!options.softDelete || !deleted.length) ? Promise.resolve() : (
+module.exports = (logger, s3, options) => (
   s3.getBucketLifecycleConfiguration({ Bucket: options.bucket })
     .promise()
     .then((config) => {
       if (config.Rules.find((rule) => options.softDeleteLifecycleId === rule.ID)) {
-        logger.debug(`Lifecycle rule ${options.softDeleteLifecycleId} already exists`);
-        return;
+        return Promise.reject(new Error(`Lifecycle rule ${options.softDeleteLifecycleId} already exists`));
       }
       return createLifecycle(logger, s3, options, config);
     })
