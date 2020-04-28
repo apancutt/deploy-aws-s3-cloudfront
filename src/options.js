@@ -140,6 +140,11 @@ module.exports = yargs
     requiresArg: true,
     type: 'array',
   })
+  .option('verbose', {
+    default: false,
+    describe: 'Show debug information',
+    type: 'boolean',
+  })
   .middleware((options) => {
     if (options.react) {
       options['cache-control'] = {

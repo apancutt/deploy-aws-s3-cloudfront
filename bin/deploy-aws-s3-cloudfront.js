@@ -8,6 +8,7 @@
 
 const AWS = require('aws-sdk');
 const winston = require('winston');
+
 const changeset = require('../src/changeset');
 const deploy = require('../src/deploy');
 const deployConfirmation = require('../src/deployConfirmation');
@@ -22,7 +23,7 @@ const s3 = new AWS.S3();
 const cloudfront = new AWS.CloudFront();
 
 const logger = winston.createLogger({
-  level: 'debug',
+  level: options.verbose ? 'debug' : 'info',
   transports: [ new winston.transports.Console({ format: winston.format.cli() }) ],
 });
 
