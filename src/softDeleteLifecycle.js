@@ -1,5 +1,13 @@
-const createLifecycle = (logger, s3, options, previous = {}) => (
-  s3.putBucketLifecycleConfiguration({
+const createLifecycle = (logger, s3, options, previous = {}) => {
+
+  logger.debug('Creating lifecycle...', {
+    expiration: options.softDeleteLifecycleExpiration,
+    id: options.softDeleteLifecycleId,
+    tagKey: options.softDeleteLifecycleTagKey,
+    tagValue: options.softDeleteLifecycleTagValue,
+  });
+
+  return s3.putBucketLifecycleConfiguration({
     Bucket: options.bucket,
     LifecycleConfiguration: {
       ...previous,
@@ -21,16 +29,9 @@ const createLifecycle = (logger, s3, options, previous = {}) => (
       ],
     }
   })
-    .promise()
-    .then(() => {
-      logger.debug(`Lifecycle rule for soft-deletion created`, {
-        expiration: options.softDeleteLifecycleExpiration,
-        id: options.softDeleteLifecycleId,
-        tagKey: options.softDeleteLifecycleTagKey,
-        tagValue: options.softDeleteLifecycleTagValue,
-      });
-    })
-);
+    .promise();
+
+};
 
 module.exports = (logger, s3, deleted, options) => (!options.softDelete || !deleted.length) ? Promise.resolve() : (
   s3.getBucketLifecycleConfiguration({ Bucket: options.bucket })
