@@ -182,9 +182,34 @@ Several options support patterns which allows the option to apply only to matchi
 
 Patterns should be relative (without a leading slash) to the source directory and are parsed using [micromatch](https://www.npmjs.com/package/micromatch).
 
-## Soft-Deleting Objects
+## Soft-Deleting Objects (Experimental)
 
-TODO
+Objects can be soft-deleted using an [S3 Object Lifecycle](https://docs.aws.amazon.com/AmazonS3/latest/dev/object-lifecycle-mgmt.html) rule.
+
+This feature can be enabled using the `--soft-delete` option. When enabled, objects are not deleted from S3 but are instead tagged for later removal by a lifecycle rule. The lifecycle rule is created automatically if one with the same `--soft-delete-lifecycle-id` (default is `Soft-Delete`) does not exist.
+
+The installed rule will automatically delete objects that are both tagged for deletion and have expired. The expiration time is relative to the object creation date, in days.
+
+In some cases, soft-deleted items may be deleted immediately after being tagged for deletion. This happens when the object was created earlier than the expiration period. The expiration period should therefore be set to a suitable duration according to your release schedule using the `--soft-delete-lifecycle-expiration` option (default is 90 days). It is not currently possible to expire objects based on the tag creation date, only the object creation date. This is a limitation of AWS S3.
+
+### Examples
+
+```
+Created                  Tagged     Deleted
+   |-----------|-----------|-----------|-----------> Days
+   0           30          60          90
+```
+
+In this example, the expiration is set to 90 days and the object was tagged for soft-deletion 60 days after creation. It will be deleted 30 days later.
+
+```
+                                            Tagged+
+Created                                     Deleted
+   |-----------|-----------|-----------|-------|---> Days
+   0           30          60          90     110
+```
+
+In this example, the expiration is set to 90 days and the object was tagged for soft-deletion 110 days after creation. It will be deleted immediately.
 
 ## React Apps
 
