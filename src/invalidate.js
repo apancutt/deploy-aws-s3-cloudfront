@@ -8,7 +8,7 @@ module.exports = (logger, cloudFront, paths, options) => Promise.all(
       .map((start) => paths.slice(start, start + INVALIDATION_LIMIT))
       .map((paths) => {
 
-        logger.debug('Invalidating...', { paths });
+        logger.debug(`Invalidating ${paths.length} paths...`, { paths });
 
         return cloudFront.createInvalidation({
           DistributionId: options.distribution,

@@ -1,8 +1,7 @@
 const createLifecycle = (logger, s3, options, previous = {}) => {
 
-  logger.debug('Creating lifecycle...', {
+  logger.debug(`Creating lifecycle ${options.softDeleteLifecycleId}...`, {
     expiration: options.softDeleteLifecycleExpiration,
-    id: options.softDeleteLifecycleId,
     tagKey: options.softDeleteLifecycleTagKey,
     tagValue: options.softDeleteLifecycleTagValue,
   });
@@ -39,9 +38,7 @@ module.exports = (logger, s3, deleted, options) => (!options.softDelete || !dele
     .promise()
     .then((config) => {
       if (config.Rules.find((rule) => options.softDeleteLifecycleId === rule.ID)) {
-        logger.debug('Lifecycle rule for soft-deletion already exists', {
-          id: options.softDeleteLifecycleId,
-        });
+        logger.debug(`Lifecycle rule ${options.softDeleteLifecycleId} already exists`);
         return;
       }
       return createLifecycle(logger, s3, options, config);

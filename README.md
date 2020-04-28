@@ -94,7 +94,7 @@ Default: `false`
 
 Logging output format.
 
-Accepted formats are: `text`, `json` or `pretty`.
+Accepted formats are: `colorized`, `json` or `text`.
 
 Default: `text`
 

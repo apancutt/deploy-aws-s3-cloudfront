@@ -80,8 +80,8 @@ module.exports = yargs
     type: 'boolean',
   })
   .option('output-format', {
-    choices: [ 'json', 'pretty', 'text' ],
-    default: 'text',
+    choices: [ 'colorized', 'json', 'text' ],
+    default: 'colorized',
     describe: 'Logging output format.',
     requiresArg: true,
     type: 'string',

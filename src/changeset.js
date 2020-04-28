@@ -6,8 +6,7 @@ const mimeTypes = require('mime-types');
 
 const localNames = (logger, options) => {
 
-  logger.debug('Fetching local files...', {
-    source: options.source,
+  logger.debug(`Fetching ${options.source}...`, {
     ignore: options.exclude,
   });
 
@@ -46,10 +45,7 @@ const remoteNamesAndChecksums = (logger, s3, options) => {
       })
   );
 
-  logger.debug('Fetching remote objects...', {
-    bucket: options.bucket,
-    prefix: options.destination
-  });
+  logger.debug(`Fetching s3://${options.bucket}${options.destination}...`);
 
   return fetch();
 

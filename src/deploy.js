@@ -5,7 +5,7 @@ const DELETE_LIMIT = 1000; // https://docs.aws.amazon.com/AWSJavaScriptSDK/lates
 
 const upload = (logger, s3, objects, options) => Promise.all(objects.map((object) => {
 
-  logger.debug('Uploading...', { object });
+  logger.debug(`Uploading ${object.path.relative}...`, { object });
 
   return s3.upload({
     ACL: object.acl,
@@ -27,7 +27,7 @@ const hardDelete = (logger, s3, objects, options) => Promise.all(
     .map((start) => objects.slice(start, start + DELETE_LIMIT))
     .map((objects) => {
 
-      logger.debug('Deleting...', { objects });
+      logger.debug(`Hard-deleting ${objects.length} objects...`, { objects });
 
       return s3.deleteObjects({
         Bucket: options.bucket,
@@ -41,7 +41,7 @@ const hardDelete = (logger, s3, objects, options) => Promise.all(
 
 const softDelete = (logger, s3, objects, options) => Promise.all(objects.map((object) => {
 
-  logger.debug('Soft deleting...', { objects });
+  logger.debug(`Soft-deleting ${objects.length} objects...`, { objects });
 
   return s3.putObjectTagging({
     Bucket: options.bucket,
