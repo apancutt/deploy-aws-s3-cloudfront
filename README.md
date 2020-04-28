@@ -110,7 +110,7 @@ Default: `false`
 
 Tag objects in AWS S3 that do not exist locally. Objects are retained if both this option and [`delete`](#delete) are omitted.
 
-See the [Soft-Deleting Objects](#soft-deleting-objects) section for more information.
+See the [Soft-Deleting Objects](#soft-deleting-objects-experimental) section for more information.
 
 Default: `false`
 
@@ -118,7 +118,7 @@ Default: `false`
 
 Expiration (in days) rule for generated soft-deletion lifecycle policy.
 
-See the [Soft-Deleting Objects](#soft-deleting-objects) section for more information.
+See the [Soft-Deleting Objects](#soft-deleting-objects-experimental) section for more information.
 
 Default: `90`
 
@@ -126,7 +126,7 @@ Default: `90`
 
 ID for generated soft-deletion lifecycle policy.
 
-See the [Soft-Deleting Objects](#soft-deleting-objects) section for more information.
+See the [Soft-Deleting Objects](#soft-deleting-objects-experimental) section for more information.
 
 Default: `Soft-Delete`
 
@@ -134,7 +134,7 @@ Default: `Soft-Delete`
 
 Key used for generated soft-deletion lifecycle policy tag.
 
-See the [Soft-Deleting Objects](#soft-deleting-objects) section for more information.
+See the [Soft-Deleting Objects](#soft-deleting-objects-experimental) section for more information.
 
 Default: `deleted`
 
@@ -142,7 +142,7 @@ Default: `deleted`
 
 Value used for generated soft-deletion lifecycle policy tag.
 
-See the [Soft-Deleting Objects](#soft-deleting-objects) section for more information.
+See the [Soft-Deleting Objects](#soft-deleting-objects-experimental) section for more information.
 
 Default: `true`
 
