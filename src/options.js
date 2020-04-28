@@ -31,10 +31,9 @@ module.exports = yargs
     type: 'array',
   })
   .option('delete', {
-    choices: [ 'hard', 'soft' ],
-    coerce: (arg) => arg || 'hard',
+    default: false,
     describe: 'Delete objects in AWS S3 that do not exist locally',
-    type: 'string',
+    type: 'boolean',
   })
   .option('destination', {
     coerce: (arg) => {
@@ -76,6 +75,11 @@ module.exports = yargs
   .option('react', {
     default: false,
     describe: 'Use recommended settings for create-react-apps',
+    type: 'boolean',
+  })
+  .option('soft-delete', {
+    default: false,
+    describe: 'Soft-delete objects in AWS S3 that do not exist locally by tagging them for expiration using a lifecycle policy',
     type: 'boolean',
   })
   .option('soft-delete-lifecycle-expiration', {
@@ -143,6 +147,9 @@ module.exports = yargs
         ...options['cache-control'],
       };
       options.source = './build/';
+    }
+    if (options.softDelete) {
+      options.delete = true;
     }
   }, true)
   .check((options) => {

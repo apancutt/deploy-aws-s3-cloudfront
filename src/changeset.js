@@ -57,6 +57,7 @@ const info = (name, deleted, options) => {
     acl: acl(name, options.acl),
     cacheControl: cacheControl(name, options.cacheControl),
     path: {
+      relative: name,
       local: options.source + name,
       s3: options.destination.replace(/^\//, '') + name,
       cloudfront: encodeURIComponent(options.destination + name)
@@ -95,7 +96,7 @@ module.exports = (s3, options) => Promise.all([
       .filter((name) => name in remoteNamesAndChecksums)
       .filter((name) => md5File.sync(options.source + name) !== remoteNamesAndChecksums[name])
       .map((name) => info(name, false, options)),
-    deleted: options.delete ? Object.keys(remoteNamesAndChecksums)
+    deleted: !options.delete ? [] : Object.keys(remoteNamesAndChecksums)
       .filter((name) => !localNames.includes(name))
-      .map((name) => info(name, true, options)) : [],
+      .map((name) => info(name, true, options)),
   }));

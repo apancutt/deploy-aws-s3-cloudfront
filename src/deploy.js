@@ -42,7 +42,7 @@ const softDelete = (s3, objects, options) => Promise.all(objects.map((object) =>
 module.exports = (s3, added, modified, deleted, options) => (
   Promise.all([
     upload(s3, added.concat(modified), options),
-    'soft' === options.delete ? softDelete(s3, deleted, options) : hardDelete(s3, deleted, options),
+    options.softDelete ? softDelete(s3, deleted, options) : hardDelete(s3, deleted, options),
   ])
     .then(() => ({ added, modified, deleted }))
 );

@@ -25,22 +25,20 @@ const createLifecycle = (s3, options, previous = {}) => (
     .then(() => options.softDeleteLifeCycleId)
 );
 
-module.exports = (s3, options) => (
-  'soft' === options.delete
-    ? s3.getBucketLifecycleConfiguration({ Bucket: options.bucket })
-      .promise()
-      .then((config) => {
-        if (config.Rules.find((rule) => options.softDeleteLifecycleId === rule.ID)) {
-          return;
-        }
-        return createLifecycle(s3, options, config);
-      })
-      .catch((err) => {
-        if (!err || 'NoSuchLifecycleConfiguration' !== err.code) {
-          return Promise.reject(err);
-        }
-        return createLifecycle(s3, options);
-      })
-    : Promise.resolve()
+module.exports = (s3, deleted, options) => (!options.softDelete || !deleted.length) ? Promise.resolve() : (
+  s3.getBucketLifecycleConfiguration({ Bucket: options.bucket })
+    .promise()
+    .then((config) => {
+      if (config.Rules.find((rule) => options.softDeleteLifecycleId === rule.ID)) {
+        return;
+      }
+      return createLifecycle(s3, options, config);
+    })
+    .catch((err) => {
+      if (!err || 'NoSuchLifecycleConfiguration' !== err.code) {
+        return Promise.reject(err);
+      }
+      return createLifecycle(s3, options);
+    })
 );
 
