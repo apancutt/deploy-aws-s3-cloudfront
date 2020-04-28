@@ -8,7 +8,7 @@ module.exports = (options) => winston.createLogger({
           return winston.format.json();
         case 'text':
           return winston.format.simple();
-        case 'colors':
+        case 'pretty':
         default:
           return winston.format.combine(
             winston.format.cli(),

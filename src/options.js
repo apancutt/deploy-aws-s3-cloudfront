@@ -61,9 +61,9 @@ module.exports = yargs
     requiresArg: true,
     type: 'array',
   })
-  .option('invalidation-paths', {
+  .option('invalidation-path', {
     default: [],
-    describe: 'Set the invalidation path(s) (URL-encoded if necessary) instead of automatically detecting objects to invalidate',
+    describe: 'Set the invalidation path(s) instead of automatically detecting objects to invalidate',
     requiresArg: true,
     type: 'array',
   })
@@ -73,8 +73,8 @@ module.exports = yargs
     type: 'boolean',
   })
   .option('output-format', {
-    choices: [ 'colors', 'json', 'text' ],
-    default: 'colors',
+    choices: [ 'json', 'pretty', 'text' ],
+    default: 'pretty',
     describe: 'Set the format for logging',
     requiresArg: true,
     type: 'string',

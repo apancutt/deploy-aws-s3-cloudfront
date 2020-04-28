@@ -18,67 +18,133 @@ If you are relying on credentials stored in `~/.aws/credentials` you can use `AW
 
 ### Options
 
-#### `--acl <canned-acl>`
+#### `--acl <pattern:value> [<pattern:value>...]`
 
-A canned ACL string. See https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#upload-property for accepted values.
+Apply ACL to specific pattern(s).
+
+See the [Using Patterns](#using-patterns) section for pattern usage.
+
+See https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#upload-property for accepted values.
 
 #### `--bucket <name>` (required)
 
 AWS S3 bucket name to deploy to.
 
-#### `--cache-control <path>:<value> [<path>:<value>...]`
+#### `--cache-control <pattern>:<value> [<pattern>:<value>...]`
 
-Set CacheControl values for S3 path(s). Uses [micromatch](https://www.npmjs.com/package/micromatch) for file matching. More specific rules should come first. For example:
-```
-# will apply first rule to index.html and second rule to all other files
---cache-control "/index.html:no-cache" "**:max-age=604800"
-# will apply first rule to index.html, second to all .svg files and last rule to all other files
-  --cache-control "/index.html:no-cache" "**.svg:max-age=31536000" "**:max-age=604800"
-```
+Apply Cache Control to specific pattern(s).
+
+See the [Using Patterns](#using-patterns) section for pattern usage.
 
 #### `--delete`
 
-Delete files from AWS S3 that do not exist locally.
+Delete objects in AWS S3 that do not exist locally. Objects are retained if both this option and [`soft-delete`](#soft-delete) are omitted.
+
+Default: `false`
 
 #### `--destination <path>`
 
 Path to remote directory to sync to.
 
+Default: `/`
+
 #### `--distribution <ID>`
 
-AWS CloudFront distribution ID to invalidate.
-
-No invalidation is performed if this option is omitted.
+AWS CloudFront distribution ID to invalidate. No invalidation is performed if this option is omitted.
 
 #### `--exclude <pattern> [<pattern>...]`
 
 Pattern(s) to exclude from deployment.
 
-Refer to the [fast-glob](https://www.npmjs.com/package/fast-glob) documentation for supported patterns.
+See the [Using Patterns](#using-patterns) section for pattern usage.
 
-#### `--invalidation-path <path>`
+#### `--invalidation-path <path> [<path>...]`
 
-Set the invalidation path (URL-encoded if necessary) instead of automatically detecting objects to invalidate.
-
-This can be used to explicity set the invalidation path rather than have the paths generated from the changeset.
+Set the invalidation path(s) instead of automatically detecting objects to invalidate.
 
 This option is typically used to reduce [invalidation costs](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Invalidation.html#PayingForInvalidation) by using a wildcard pattern (e.g. `--invalidation-path "/*"`).
 
+Special characters should be URL-encoded where necessary.
+
 #### `--non-interactive`
 
-Do not prompt for confirmation.
+Do not prompt for confirmations.
+
+Default: `false`
+
+#### `--output-format <format>`
+
+Logging output format.
+
+Accepted formats are: `text`, `json` or `pretty`.
+
+Default: `pretty`
 
 #### `--react`
 
-Use recommended settings for `create-react-app`s and disable caching of `index.html`.
+Use recommended settings for React applications.
 
-Default value `false`
+See the [React Apps](#react-apps) section for more information.
+
+Default: `false`
+
+#### `--soft-delete`
+
+Tag objects in AWS S3 that do not exist locally. Objects are retained if both this option and [`delete`](#delete) are omitted.
+
+See the [Soft-Deleting Objects](#soft-deleting-objects) section for more information.
+
+Default: `false`
+
+#### `--soft-delete-lifecycle-expiration <expiration>`
+
+Expiration (in days) rule for generated soft-deletion lifecycle policy.
+
+See the [Soft-Deleting Objects](#soft-deleting-objects) section for more information.
+
+Default: `90`
+
+#### `--soft-delete-lifecycle-id <ID>`
+
+ID for generated soft-deletion lifecycle policy.
+
+See the [Soft-Deleting Objects](#soft-deleting-objects) section for more information.
+
+Default: `Soft-Delete`
+
+#### `--soft-delete-lifecycle-tag-key <key>`
+
+Key used for generated soft-deletion lifecycle policy tag.
+
+See the [Soft-Deleting Objects](#soft-deleting-objects) section for more information.
+
+Default: `deleted`
+
+#### `--soft-delete-lifecycle-tag-value <value>`
+
+Value used for generated soft-deletion lifecycle policy tag.
+
+See the [Soft-Deleting Objects](#soft-deleting-objects) section for more information.
+
+Default: `true`
 
 #### `--source <path>`
 
 Path to local directory to sync from.
 
-Default value `.`
+Default: `.`
+
+#### `--tags <pattern>:<tag1key>=<tag1value>[,<tag2key>=<tag2value>...] [<pattern>:<tag1key>=<tag1value>[,<tag2key>=<tag2value>...]...]`
+
+Apply tags to specific pattern(s).
+
+See the [Using Patterns](#using-patterns) section for pattern usage.
+
+#### `--verbose`
+
+Enable verbose logging.
+
+Default: `false`
 
 ## Installation as a `run-script` alias (optional)
 
@@ -92,11 +158,19 @@ Add a `deploy` script alias to your `package.json` file:
       }
     }
 
-Run `yarn run deploy` to deploy.
+Run `yarn run deploy` or `npm run deploy` to deploy.
 
-If you need to pass user or environment-level options that you don't want committed into `package.json` you can provide these at call-time, e.g. `yarn run deploy --distribution abc123`.
+If you need to pass user or environment-level options that you don't want committed into `package.json` you can provide these at call-time, e.g. `yarn run deploy --distribution abc123` or `npm run deploy -- --distribution abc123`.
 
-## Configuration for [create-react-app](https://github.com/facebook/create-react-app) projects
+## Using Patterns
+
+TODO
+
+## Soft-Deleting Objects
+
+TODO
+
+## React Apps
 
 Pass the `--react` option when deploying apps created using `create-react-app`. This is shortcut for `deploy-aws-s3-cloudfront --source ./build/ --cache-control index.html:no-cache`.
 
