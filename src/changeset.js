@@ -62,7 +62,10 @@ const cacheControl = (name, cacheControls) => (Object.entries(cacheControls).fin
 const tagSet = (name, tags) => (
   Object.entries(tags)
     .filter(([ pattern ]) => micromatch.isMatch(name, pattern))
-    .reduce((accumulator, [ , tags ]) => accumulator.concat(Object.entries(tags).map(([ key, value ]) => ({ Key: key, Value: value }))), [])
+    .reduce((accumulator, [ , tags ]) => ({
+      ...accumulator,
+      ...tags,
+    }), {})
 );
 
 const info = (name, deleted, options) => {

@@ -1,4 +1,5 @@
 const fs = require('fs');
+const qs = require('querystring');
 
 const DELETE_LIMIT = 1000; // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#deleteObjects-property
 
@@ -14,9 +15,7 @@ const upload = (logger, s3, objects, options) => Promise.all(objects.map((object
     ContentLength: object.contentLength,
     ContentType: object.contentType,
     Key: object.path.s3,
-    Tagging: {
-      TagSet: object.tagSet,
-    },
+    Tagging: qs.stringify(object.tagSet),
   }).promise();
 
 }));
@@ -48,10 +47,10 @@ const softDelete = (logger, s3, objects, options) => Promise.all(objects.map((ob
     Bucket: options.bucket,
     Key: object.path.s3,
     Tagging: {
-      TagSet: [
+      TagSet: Object.entries({
         ...object.tagSet,
-        { [options.softDeleteLifecycleTagKey]: options.softDeleteLifecycleTagValue },
-      ],
+        [options.softDeleteLifecycleTagKey]: options.softDeleteLifecycleTagValue,
+      }).map(([ key, value ]) => ({ Key: key, Value: value })),
     },
   }).promise();
 
