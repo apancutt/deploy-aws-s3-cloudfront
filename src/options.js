@@ -32,6 +32,11 @@ module.exports = yargs
     requiresArg: true,
     type: 'array',
   })
+  .option('debug', {
+    default: false,
+    describe: 'Enable output of debug log messages.',
+    type: 'boolean',
+  })
   .option('delete', {
     default: false,
     describe: 'Delete objects in AWS S3 that do not exist locally. Objects are retained if both this option and soft-delete are omitted.',
@@ -148,11 +153,6 @@ module.exports = yargs
     describe: 'Apply tags to specific pattern(s). All patterns that match the path are applied.',
     requiresArg: true,
     type: 'array',
-  })
-  .option('verbose', {
-    default: false,
-    describe: 'Enable verbose logging.',
-    type: 'boolean',
   })
   .middleware((options) => {
     if (options.react) {

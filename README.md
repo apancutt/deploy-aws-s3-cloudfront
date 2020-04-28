@@ -42,6 +42,12 @@ See the [Using Patterns](#using-patterns) section for pattern usage.
 
 Default: `[]`
 
+#### `--debug`
+
+Enable output of debug log messages.
+
+Default: `false`
+
 #### `--delete`
 
 Delete objects in AWS S3 that do not exist locally. Objects are retained if both this option and [`soft-delete`](#soft-delete) are omitted.
@@ -153,12 +159,6 @@ Apply tags to specific pattern(s). All patterns that match the path are applied.
 See the [Using Patterns](#using-patterns) section for pattern usage.
 
 Default: `[]`
-
-#### `--verbose`
-
-Enable verbose logging.
-
-Default: `false`
 
 ## Installation as a `run-script` alias (optional)
 

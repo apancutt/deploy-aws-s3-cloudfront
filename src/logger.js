@@ -22,6 +22,6 @@ module.exports = (options) => winston.createLogger({
           );
       }
     }) (),
-    level: options.verbose ? 'debug' : 'info',
+    level: options.debug ? 'debug' : 'info',
   }) ],
 });
