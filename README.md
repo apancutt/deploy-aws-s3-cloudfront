@@ -20,7 +20,7 @@ If you are relying on credentials stored in `~/.aws/credentials` you can use `AW
 
 #### `--acl <pattern:value> [<pattern:value>...]`
 
-Apply ACL to specific pattern(s).
+Apply ACL to specific pattern(s). The first pattern to match the path is applied.
 
 See the [Using Patterns](#using-patterns) section for pattern usage.
 
@@ -36,7 +36,7 @@ Default: `undefined`
 
 #### `--cache-control <pattern>:<value> [<pattern>:<value>...]`
 
-Apply Cache Control to specific pattern(s).
+Apply Cache Control to specific pattern(s). The first pattern to match the path is applied.
 
 See the [Using Patterns](#using-patterns) section for pattern usage.
 
@@ -70,7 +70,7 @@ Default: `[]`
 
 #### `--invalidation-path <path> [<path>...]`
 
-Set the invalidation path(s) instead of automatically detecting objects to invalidate. Paths should be relative to the root of the distribution.
+Set the invalidation path(s) instead of automatically detecting objects to invalidate. Paths should be absolute (with a leading slash).
 
 This option is typically used to reduce [invalidation costs](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Invalidation.html#PayingForInvalidation) by using a wildcard pattern (e.g. `--invalidation-path "/*"`).
 
@@ -148,7 +148,7 @@ Default: `.`
 
 #### `--tags <pattern>:<tag1key>=<tag1value>[,<tag2key>=<tag2value>...] [<pattern>:<tag1key>=<tag1value>[,<tag2key>=<tag2value>...]...]`
 
-Apply tags to specific pattern(s).
+Apply tags to specific pattern(s). All patterns that match the path are applied.
 
 See the [Using Patterns](#using-patterns) section for pattern usage.
 
@@ -178,7 +178,9 @@ If you need to pass user or environment-level options that you don't want commit
 
 ## Using Patterns
 
-TODO
+Several options support patterns which allows the option to apply only to matching objects.
+
+Patterns should be relative (without a leading slash) to the source directory and are parsed using [micromatch](https://www.npmjs.com/package/micromatch).
 
 ## Soft-Deleting Objects
 

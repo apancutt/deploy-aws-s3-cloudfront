@@ -12,7 +12,7 @@ module.exports = yargs
       return { ...previous, [pattern]: value };
     }, {}),
     default: [],
-    describe: 'Apply ACL to specific pattern(s).',
+    describe: 'Apply ACL to specific pattern(s). The first pattern to match the path is applied.',
     requiresArg: true,
     type: 'array',
   })
@@ -28,7 +28,7 @@ module.exports = yargs
       return { ...previous, [pattern]: value };
     }, {}),
     default: [],
-    describe: 'Apply Cache Control to specific pattern(s).',
+    describe: 'Apply Cache Control to specific pattern(s). The first pattern to match the path is applied.',
     requiresArg: true,
     type: 'array',
   })
@@ -65,7 +65,7 @@ module.exports = yargs
   })
   .option('invalidation-path', {
     default: [],
-    describe: 'Set the invalidation path(s) instead of automatically detecting objects to invalidate. Paths should be relative to the root of the distribution.',
+    describe: 'Set the invalidation path(s) instead of automatically detecting objects to invalidate. Paths should be absolute (with a leading slash).',
     requiresArg: true,
     type: 'array',
   })
@@ -145,7 +145,7 @@ module.exports = yargs
       };
     }, {}),
     default: [],
-    describe: 'Apply tags to specific pattern(s).',
+    describe: 'Apply tags to specific pattern(s). All patterns that match the path are applied.',
     requiresArg: true,
     type: 'array',
   })
