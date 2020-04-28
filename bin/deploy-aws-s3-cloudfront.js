@@ -6,113 +6,34 @@
  * directory of this source tree.
  */
 
-const AWS = require('aws-sdk');
-const PromptConfirm = require('prompt-confirm');
-const yargs = require('yargs');
-require('polyfill-object.fromentries');
+const options = require('../src/options').argv
 
+const changeset = require('../src/changeset');
+const cloudFront = require('../src/cloudFront')();
 const deploy = require('../src/deploy');
-const diff = require('../src/diff');
-const fetch = require('../src/fetch');
+const deployConfirmation = require('../src/deployConfirmation');
 const invalidate = require('../src/invalidate');
-const { fatal, info, warn } = require('../src/log');
+const invalidateConfirmation = require('../src/invalidateConfirmation');
+const logger = require('../src/logger')(options);
+const s3 = require('../src/s3')();
+const softDeleteLifecycle = require('../src/softDeleteLifecycle');
+const stale = require('../src/stale');
+const summarize = require('../src/summarize');
 
-const argv = yargs
-  .usage('$0 [options]', 'Syncs a local directory to an AWS S3 bucket, optionally invalidating affected CloudFront paths.')
-  .option('acl', {
-    type: 'string',
-    describe: 'A canned ACL string',
-  })
-  .option('bucket', {
-    type: 'string',
-    demand: true,
-    describe: 'AWS S3 bucket name to deploy to',
-  })
-  .option('cache-control', {
-    type: 'array',
-    describe: 'Set CacheControl values for S3 path(s)',
-    default: [],
-  })
-  .option('delete', {
-    type: 'boolean',
-    describe: 'Delete files from AWS S3 that do not exist locally',
-    default: false,
-  })
-  .option('destination', {
-    type: 'string',
-    describe: 'Path to remote directory to sync to',
-  })
-  .option('distribution', {
-    type: 'string',
-    describe: 'AWS CloudFront distribution ID to invalidate',
-  })
-  .option('exclude', {
-    type: 'array',
-    describe: 'Patterns to exclude from deployment',
-    default: [],
-  })
-  .option('invalidation-path', {
-    type: 'string',
-    describe: 'Set the invalidation path (URL-encoded if necessary) instead of automatically detecting objects to invalidate',
-  })
-  .option('non-interactive', {
-    type: 'boolean',
-    describe: 'Do not prompt for confirmation',
-    default: false,
-  })
-  .option('react', {
-    type: 'boolean',
-    describe: 'Use recommended settings for create-react-apps and disable caching of index.html',
-    default: false,
-  })
-  .option('source', {
-    type: 'string',
-    describe: 'Path to local directory to sync from',
-    default: '.',
-  })
-  .argv;
-
-const s3 = new AWS.S3();
-const cloudfront = new AWS.CloudFront();
-
-if (argv.react) {
-  argv.cacheControl.push('index.html:no-cache');
-  argv.source = './build/';
-}
-
-fetch(s3, argv.bucket, argv.source, argv.destination, argv.exclude)
-  .then(({ local, remote }) => diff(local, remote, !argv.delete))
-  .then(({ added, modified, deleted }) => {
-
-    const uploads = added.concat(modified);
-    const deletes = deleted;
-
-    return (!argv.nonInteractive && (uploads.length || deletes.length) ? new PromptConfirm('Continue deployment?').run() : Promise.resolve(true)).then((answer) => {
-
-      if (!answer) {
-        warn('Abandoning deployment');
-        return { uploads: [], deletes: [] };
-      }
-
-      return { uploads, deletes };
-
-    });
-
-  })
-  .then(({ uploads, deletes }) => (
-    deploy(s3, argv.bucket, uploads, deletes, argv.source, argv.destination, argv.acl, Object.fromEntries([ ...argv.cacheControl ].map((arg) => arg.split(':', 2))))
-      .then(({ uploaded, deleted }) => {
-
-        const changes = uploaded.concat(deleted);
-
-        if (!argv.distribution || !changes.length) {
-          return [];
-        }
-
-        return invalidate(cloudfront, argv.distribution, argv.invalidationPath ? [ argv.invalidationPath ] : changes, !argv.invalidationPath);
-
-      })
-      .then((invalidations) => ({ uploads, deletes, invalidations }))
+changeset(logger, s3, options)
+  .then(({ added, deleted, modified }) => deployConfirmation(logger, added, modified, deleted, options))
+  .then(({ added, deleted, modified }) => (
+    softDeleteLifecycle(logger, s3, deleted, options)
+      .then(() => deploy(logger, s3, added, modified, deleted, options))
   ))
-  .then(({ uploads, deletes, invalidations }) => info(`Deployment complete (${uploads.length} uploaded, ${deletes.length} deleted, ${invalidations.length} invalidated)`))
-  .catch((err) => fatal(err.message));
+  .then(({ added, deleted, modified }) => (
+    stale(modified, deleted, options)
+      .then((stale) => invalidateConfirmation(logger, stale, options))
+      .then((stale) => invalidate(logger, cloudFront, stale, options))
+      .then((invalidated) => ({ added, deleted, invalidated, modified }))
+  ))
+  .then(({ added, deleted, invalidated, modified }) => summarize(logger, added, modified, deleted, invalidated, options))
+  .catch(({ message, ...rest }) => {
+    logger.error(message, rest);
+    process.exitCode = 1;
+  });

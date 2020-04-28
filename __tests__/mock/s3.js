@@ -7,15 +7,34 @@ class S3 {
     return promisable();
   }
 
+  getBucketLifecycleConfiguration(params) {
+    this.lastGetBucketLifecycleConfigurationParams = params;
+    const err = new Error();
+    err.code = 'NoSuchLifecycleConfiguration';
+    return promisable(Promise.reject(err));
+  }
+
   listObjectsV2(params) {
     this.lastListObjectsV2Params = params;
     return promisable({
       Contents: [
-        { Key: 'a.txt', ETag: 'abc123' },
+        { Key: 'test/modified.txt', ETag: 'testtesttesttesttesttesttesttest' },
+        { Key: 'test/unmodified.txt', ETag: '9c987af8bff0bc97a19af3df860a6ce8' },
+        { Key: 'test/remote.txt', ETag: 'testtesttesttesttesttesttesttest' },
       ],
       ContinuationToken: undefined,
       IsTruncated: false,
     });
+  }
+
+  putBucketLifecycleConfiguration(params) {
+    this.lastPutBucketLifecycleConfigurationParams = params;
+    return promisable();
+  }
+
+  putObjectTagging(params) {
+    this.lastPutObjectTaggingParams = params;
+    return promisable();
   }
 
   upload(params) {

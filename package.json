@@ -25,14 +25,12 @@
   ],
   "dependencies": {
     "aws-sdk": "2",
-    "colors": "1",
     "fast-glob": "3",
     "md5-file": "5",
     "micromatch": "4",
     "mime-types": "2",
-    "polyfill-object.fromentries": "1",
-    "pretty-bytes": "5",
     "prompt-confirm": "2",
+    "winston": "3",
     "yargs": "15"
   },
   "devDependencies": {
