@@ -2,6 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const yargs = require('yargs');
 
+yargs.parserConfiguration({ 'strip-dashed': true });
+
 module.exports = yargs
   .usage('$0 [options]', 'Syncs a local directory to an AWS S3 bucket, optionally invalidating affected CloudFront paths.')
   .option('acl', {
