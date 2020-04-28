@@ -10,7 +10,6 @@ module.exports = (logger, paths, options) => {
     (!options.nonInteractive && paths.length)
       ? (new PromptConfirm('Proceed with invalidation?')).run()
       : true
-  )
-    .then((confirmed) => confirmed ? paths : []);
+  ).then((confirmed) => confirmed ? paths : []);
 
 };
