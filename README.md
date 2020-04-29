@@ -110,7 +110,7 @@ Default: `false`
 
 Tag objects in AWS S3 that do not exist locally. Objects are retained if both this option and [`delete`](#delete) are omitted.
 
-See the [Soft-Deleting Objects](#soft-deleting-objects-experimental) section for more information.
+See the [Soft-Deleting Objects](#soft-deleting-objects) section for more information.
 
 Default: `false`
 
@@ -118,7 +118,7 @@ Default: `false`
 
 Key used for generated soft-deletion lifecycle policy tag.
 
-See the [Soft-Deleting Objects](#soft-deleting-objects-experimental) section for more information.
+See the [Soft-Deleting Objects](#soft-deleting-objects) section for more information.
 
 Default: `deleted`
 
@@ -126,7 +126,7 @@ Default: `deleted`
 
 Value used for generated soft-deletion lifecycle policy tag.
 
-See the [Soft-Deleting Objects](#soft-deleting-objects-experimental) section for more information.
+See the [Soft-Deleting Objects](#soft-deleting-objects) section for more information.
 
 Default: `true`
 
@@ -166,7 +166,7 @@ Several options support patterns which allows the option to apply only to matchi
 
 Patterns should be relative (without a leading slash) to the source directory and are parsed using [micromatch](https://www.npmjs.com/package/micromatch).
 
-## Soft-Deleting Objects (Experimental)
+## Soft-Deleting Objects
 
 Objects can be soft-deleted using an [S3 Object Lifecycle](https://docs.aws.amazon.com/AmazonS3/latest/dev/object-lifecycle-mgmt.html) expiration rule.
 
@@ -254,6 +254,8 @@ Default: `true`
 ## React Apps
 
 Use the `--react` option when deploying apps created using `create-react-app`. This is shortcut for `deploy-aws-s3-cloudfront --source ./build/ --cache-control index.html:no-cache`.
+
+If you opt to delete objects on deployment, it is recommended to use the `--soft-delete` option to minimise impact to users online during a deployment. Such users will have loaded the previous version of `index.html` which will likely reference assets which have since been deleted by a deployment. They will not receive the latest `index.html` until they refresh. Using the `--soft-delete` option will retain stale objects in S3 for a period of time to allow online users to continue browsing until they refresh to get the latest version.
 
 ## Alternatives
 
