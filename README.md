@@ -19,7 +19,7 @@ If you are relying on credentials stored in `~/.aws/credentials` you can use `AW
 
 ### Options
 
-#### Global Options
+#### Options: Global
 
 ##### `--bucket <name>` (required)
 
@@ -47,7 +47,7 @@ Accepted formats are: `colorized`, `json` or `text`.
 
 Default: `text`
 
-#### deploy-aws-s3-cloudfront` Options
+#### Options: `deploy-aws-s3-cloudfront`
 
 ##### `--acl <pattern:value> [<pattern:value>...]`
 
@@ -149,7 +149,7 @@ See the [Using Patterns](#using-patterns) section for pattern usage.
 
 Default: `[]`
 
-#### `deploy-aws-s3-cloudfront install-soft-delete`  Options
+#### Options: `deploy-aws-s3-cloudfront install-soft-delete`
 
 ##### `--expiration <expiration>`
 
