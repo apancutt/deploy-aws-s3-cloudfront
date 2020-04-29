@@ -184,7 +184,7 @@ Add script aliases to your `package.json` file:
   ...
   "scripts": {
     ...
-    "install-soft-delete": "deploy-aws-s3-cloudfront install-soft-delete --bucket my-bucket"
+    "install-soft-delete": "deploy-aws-s3-cloudfront install-soft-delete --bucket my-bucket",
     "deploy": "deploy-aws-s3-cloudfront --bucket my-bucket"
   }
 }
