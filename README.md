@@ -190,7 +190,7 @@ Add script aliases to your `package.json` file:
 }
 ```
 
-Run `yarn run deploy` or `npm run deploy` to deploy. A soft-delete lifecycle rule will also be installed. Remove the `predeploy` script if you do not use the soft-deletion feature.
+Run `yarn run deploy` or `npm run deploy` to deploy. A soft-delete lifecycle rule will also be installed. Remove the `predeploy` script if you do not use the soft-deletion feature or prefer to install it manually.
 
 If you need to pass user or environment-level options that you don't want committed into `package.json` you can provide these at call-time, e.g. `yarn run deploy --distribution abc123` or `npm run deploy -- --distribution abc123`.
 
