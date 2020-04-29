@@ -178,4 +178,16 @@ module.exports = yargs
         requiresArg: true,
         type: 'string',
       })
+      .option('tag-key', {
+        default: 'deleted',
+        describe: 'Key used for generated soft-deletion lifecycle policy tag.',
+        requiresArg: true,
+        type: 'string',
+      })
+      .option('tag-value', {
+        default: 'true',
+        describe: 'Value used for generated soft-deletion lifecycle policy tag.',
+        requiresArg: true,
+        type: 'string',
+      })
   ));
