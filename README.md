@@ -177,15 +177,20 @@ Default: `true`
 
 ## Installation as a `run-script` alias (optional)
 
-Add a `deploy` script alias to your `package.json` file:
+Add script aliases to your `package.json` file:
 
-    {
-      ...
-      "scripts": {
-        ...
-        "deploy": "deploy-aws-s3-cloudfront --bucket my-bucket"
-      }
-    }
+```
+{
+  ...
+  "scripts": {
+    ...
+    "install-soft-delete": "deploy-aws-s3-cloudfront install-soft-delete --bucket my-bucket"
+    "deploy": "deploy-aws-s3-cloudfront --bucket my-bucket"
+  }
+}
+```
+
+Run `yarn run install-soft-delete` or `npm run install-soft-delete` to install the soft-delete S3 Lifecycle rule.
 
 Run `yarn run deploy` or `npm run deploy` to deploy.
 
