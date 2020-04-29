@@ -184,15 +184,13 @@ Add script aliases to your `package.json` file:
   ...
   "scripts": {
     ...
-    "install-soft-delete": "deploy-aws-s3-cloudfront install-soft-delete --bucket my-bucket",
+    "predeploy": "deploy-aws-s3-cloudfront install-soft-delete --bucket my-bucket",
     "deploy": "deploy-aws-s3-cloudfront --bucket my-bucket"
   }
 }
 ```
 
-Run `yarn run install-soft-delete` or `npm run install-soft-delete` to install the soft-delete S3 Lifecycle rule.
-
-Run `yarn run deploy` or `npm run deploy` to deploy.
+Run `yarn run deploy` or `npm run deploy` to deploy. A soft-delete lifecycle rule will also be installed. Remove the `predeploy` script if you do not use the soft-deletion feature.
 
 If you need to pass user or environment-level options that you don't want committed into `package.json` you can provide these at call-time, e.g. `yarn run deploy --distribution abc123` or `npm run deploy -- --distribution abc123`.
 
