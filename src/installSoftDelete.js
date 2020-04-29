@@ -1,9 +1,9 @@
 const createLifecycle = (logger, s3, options, previous = {}) => {
 
-  logger.debug(`Creating lifecycle ${options.softDeleteLifecycleId}...`, {
-    expiration: options.softDeleteLifecycleExpiration,
-    tagKey: options.softDeleteLifecycleTagKey,
-    tagValue: options.softDeleteLifecycleTagValue,
+  logger.debug(`Creating lifecycle ${options.id}...`, {
+    expiration: options.expiration,
+    tagKey: options.tagKey,
+    tagValue: options.tagValue,
   });
 
   return s3.putBucketLifecycleConfiguration({
@@ -14,15 +14,15 @@ const createLifecycle = (logger, s3, options, previous = {}) => {
         ...(previous.Rules || []),
         {
           Expiration: {
-            Days: options.softDeleteLifecycleExpiration,
+            Days: options.expiration,
           },
           Filter: {
             Tag: {
-              Key: options.softDeleteLifecycleTagKey,
-              Value: options.softDeleteLifecycleTagValue,
+              Key: options.tagKey,
+              Value: options.tagValue,
             },
           },
-          ID: options.softDeleteLifecycleId,
+          ID: options.id,
           Status: 'Enabled',
         },
       ],
@@ -30,8 +30,8 @@ const createLifecycle = (logger, s3, options, previous = {}) => {
   })
     .promise()
     .then(() => {
-      logger.info(`Soft-delete lifecycle rule created on s3://${options.bucket} named "${options.softDeleteLifecycleId}"`);
-      return options.softDeleteLifecycleId;
+      logger.info(`Soft-delete lifecycle rule created on s3://${options.bucket} named "${options.id}"`);
+      return options.id;
     });
 
 };
@@ -40,8 +40,8 @@ module.exports = (logger, s3, options) => (
   s3.getBucketLifecycleConfiguration({ Bucket: options.bucket })
     .promise()
     .then((config) => {
-      if (config.Rules.find((rule) => options.softDeleteLifecycleId === rule.ID)) {
-        return Promise.reject(new Error(`Lifecycle rule ${options.softDeleteLifecycleId} already exists`));
+      if (config.Rules.find((rule) => options.id === rule.ID)) {
+        return Promise.reject(new Error(`Lifecycle rule ${options.id} already exists`));
       }
       return createLifecycle(logger, s3, options, config);
     })

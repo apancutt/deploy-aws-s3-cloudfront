@@ -15,10 +15,41 @@ If you are relying on credentials stored in `~/.aws/credentials` you can use `AW
 ## Usage
 
     deploy-aws-s3-cloudfront --bucket <bucket> [options]
+    deploy-aws-s3-cloudfront install-soft-delete --bucket <bucket> [options]
 
 ### Options
 
-#### `--acl <pattern:value> [<pattern:value>...]`
+#### Global
+
+##### `--bucket <name>` (required)
+
+AWS S3 bucket name to deploy to.
+
+Default: `undefined`
+
+##### `--debug`
+
+Enable output of debugging log messages.
+
+Default: `false`
+
+##### `--non-interactive`
+
+Do not prompt for confirmations.
+
+Default: `false`
+
+##### `--output-format <format>`
+
+Logging output format.
+
+Accepted formats are: `colorized`, `json` or `text`.
+
+Default: `text`
+
+#### Options (`deploy-aws-s3-cloudfront`)
+
+##### `--acl <pattern:value> [<pattern:value>...]`
 
 Apply ACL to specific pattern(s). The first pattern to match the path is applied.
 
@@ -28,13 +59,7 @@ See https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#upload-prope
 
 Default: `[]`
 
-#### `--bucket <name>` (required)
-
-AWS S3 bucket name to deploy to.
-
-Default: `undefined`
-
-#### `--cache-control <pattern>:<value> [<pattern>:<value>...]`
+##### `--cache-control <pattern>:<value> [<pattern>:<value>...]`
 
 Apply Cache Control to specific pattern(s). The first pattern to match the path is applied.
 
@@ -42,31 +67,25 @@ See the [Using Patterns](#using-patterns) section for pattern usage.
 
 Default: `[]`
 
-#### `--debug`
-
-Enable output of debugging log messages.
-
-Default: `false`
-
-#### `--delete`
+##### `--delete`
 
 Delete objects in AWS S3 that do not exist locally. Objects are retained if both this option and [`soft-delete`](#soft-delete) are omitted.
 
 Default: `false`
 
-#### `--destination <path>`
+##### `--destination <path>`
 
 Path to remote directory to sync to.
 
 Default: `/`
 
-#### `--distribution <ID>`
+##### `--distribution <ID>`
 
 AWS CloudFront distribution ID to invalidate. No invalidation is performed if this option is omitted.
 
 Default: `undefined`
 
-#### `--exclude <pattern> [<pattern>...]`
+##### `--exclude <pattern> [<pattern>...]`
 
 Pattern(s) to exclude from deployment.
 
@@ -74,7 +93,7 @@ See the [Using Patterns](#using-patterns) section for pattern usage.
 
 Default: `[]`
 
-#### `--invalidation-path <path> [<path>...]`
+##### `--invalidation-path <path> [<path>...]`
 
 Set the invalidation path(s) instead of automatically detecting objects to invalidate. Paths should be absolute (with a leading slash).
 
@@ -84,21 +103,7 @@ Special characters should be URL-encoded where necessary.
 
 Default: `[]`
 
-#### `--non-interactive`
-
-Do not prompt for confirmations.
-
-Default: `false`
-
-#### `--output-format <format>`
-
-Logging output format.
-
-Accepted formats are: `colorized`, `json` or `text`.
-
-Default: `text`
-
-#### `--react`
+##### `--react`
 
 Use recommended settings for React applications.
 
@@ -106,7 +111,7 @@ See the [React Apps](#react-apps) section for more information.
 
 Default: `false`
 
-#### `--soft-delete`
+##### `--soft-delete`
 
 Tag objects in AWS S3 that do not exist locally. Objects are retained if both this option and [`delete`](#delete) are omitted.
 
@@ -114,7 +119,7 @@ See the [Soft-Deleting Objects](#soft-deleting-objects) section for more informa
 
 Default: `false`
 
-#### `--soft-delete-lifecycle-tag-key <key>`
+##### `--soft-delete-tag-key <key>`
 
 Key used for generated soft-deletion lifecycle policy tag.
 
@@ -122,7 +127,7 @@ See the [Soft-Deleting Objects](#soft-deleting-objects) section for more informa
 
 Default: `deleted`
 
-#### `--soft-delete-lifecycle-tag-value <value>`
+##### `--soft-delete-tag-value <value>`
 
 Value used for generated soft-deletion lifecycle policy tag.
 
@@ -130,19 +135,45 @@ See the [Soft-Deleting Objects](#soft-deleting-objects) section for more informa
 
 Default: `true`
 
-#### `--source <path>`
+##### `--source <path>`
 
 Path to local directory to sync from.
 
 Default: `.`
 
-#### `--tags <pattern>:<tag1key>=<tag1value>[,<tag2key>=<tag2value>...] [<pattern>:<tag1key>=<tag1value>[,<tag2key>=<tag2value>...]...]`
+##### `--tags <pattern>:<tag1key>=<tag1value>[,<tag2key>=<tag2value>...] [<pattern>:<tag1key>=<tag1value>[,<tag2key>=<tag2value>...]...]`
 
 Apply tags to specific pattern(s). All patterns that match the path are applied.
 
 See the [Using Patterns](#using-patterns) section for pattern usage.
 
 Default: `[]`
+
+#### Options (`deploy-aws-s3-cloudfront install-soft-delete`)
+
+#### `--expiration <expiration>`
+
+Expiration (in days) rule for generated soft-deletion lifecycle policy.
+
+Default: `90`
+
+#### `--id <ID>`
+
+ID for generated soft-deletion lifecycle policy.
+
+Default: `Soft-Delete`
+
+#### `--tag-key <key>`
+
+Key used for generated soft-deletion lifecycle policy tag.
+
+Default: `deleted`
+
+#### `--tag-value <value>`
+
+Value used for generated soft-deletion lifecycle policy tag.
+
+Default: `true`
 
 ## Installation as a `run-script` alias (optional)
 
@@ -170,11 +201,11 @@ Patterns should be relative (without a leading slash) to the source directory an
 
 Objects can be soft-deleted using an [S3 Object Lifecycle](https://docs.aws.amazon.com/AmazonS3/latest/dev/object-lifecycle-mgmt.html) expiration rule.
 
-This feature can be enabled using the `--soft-delete` option. When enabled, objects are not deleted from S3 but are instead tagged for later removal by a lifecycle rule. The lifecycle rule is created using the `create-soft-delete-lifecycle` tool (usage below).
+This feature can be enabled using the `--soft-delete` option. When enabled, objects are not deleted from S3 but are instead tagged for later removal by a lifecycle rule. The lifecycle rule is created using the `install-soft-delete` command.
 
 The installed rule will automatically delete objects that are both tagged for deletion and have expired. The expiration time is relative to the object creation date, in days.
 
-In some cases, soft-deleted items may be deleted immediately after being tagged for deletion. This happens when the object was created earlier than the expiration period. The expiration period should therefore be set to a suitable duration according to your release schedule using the `--soft-delete-lifecycle-expiration` option (default is 90 days). It is not currently possible to expire objects based on the tag creation date, only the object creation date. This is a limitation of AWS S3.
+In some cases, soft-deleted items may be deleted immediately after being tagged for deletion. This happens when the object was created earlier than the expiration period. The expiration period should therefore be set to a suitable duration according to your release schedule using the `--expiration` option (default is 90 days). It is not currently possible to expire objects based on the tag creation date, only the object creation date. This is a limitation of AWS S3.
 
 ### Examples
 
@@ -194,62 +225,6 @@ Created                                     Deleted
 ```
 
 In this example, the expiration is set to 90 days and the object was tagged for soft-deletion 110 days after creation. It will be deleted immediately.
-
-### Usage
-
-    create-soft-delete-lifecycle --bucket <bucket> [options]
-
-### Options
-
-#### `--bucket <name>` (required)
-
-AWS S3 bucket name to deploy to.
-
-Default: `undefined`
-
-#### `--debug`
-
-Enable output of debugging log messages.
-
-Default: `false`
-
-#### `--non-interactive`
-
-Do not prompt for confirmations.
-
-Default: `false`
-
-#### `--output-format <format>`
-
-Logging output format.
-
-Accepted formats are: `colorized`, `json` or `text`.
-
-Default: `text`
-
-#### `--soft-delete-lifecycle-expiration <expiration>`
-
-Expiration (in days) rule for generated soft-deletion lifecycle policy.
-
-Default: `90`
-
-#### `--soft-delete-lifecycle-id <ID>`
-
-ID for generated soft-deletion lifecycle policy.
-
-Default: `Soft-Delete`
-
-#### `--soft-delete-lifecycle-tag-key <key>`
-
-Key used for generated soft-deletion lifecycle policy tag.
-
-Default: `deleted`
-
-#### `--soft-delete-lifecycle-tag-value <value>`
-
-Value used for generated soft-deletion lifecycle policy tag.
-
-Default: `true`
 
 ## React Apps
 

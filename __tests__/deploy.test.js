@@ -1,7 +1,7 @@
 const Logger = require('./mock/logger');
 const S3 = require('./mock/s3');
 const deploy = require('../src/deploy');
-const options = require('./mock/options').argv;
+const options = require('./mock/options')['default']().argv;
 
 describe('deploy', () => {
 
@@ -19,7 +19,7 @@ describe('deploy', () => {
       relative: 'local.txt',
       s3: 'test/local.txt',
     },
-    tagSet: [],
+    tagSet: {},
   }];
 
   const deleted = [{
@@ -33,7 +33,7 @@ describe('deploy', () => {
       relative: 'remote.txt',
       s3: 'test/remote.txt',
     },
-    tagSet: [],
+    tagSet: {},
   }];
 
   const modified = [{
@@ -47,7 +47,7 @@ describe('deploy', () => {
       relative: 'modified.txt',
       s3: 'test/modified.txt',
     },
-    tagSet: [],
+    tagSet: {},
   }];
 
   beforeAll(() => {

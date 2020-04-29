@@ -1,7 +1,7 @@
 const Logger = require('./mock/logger');
 const CloudFront = require('./mock/cloudfront');
 const invalidate = require('../src/invalidate');
-const options = require('./mock/options').argv;
+const options = require('./mock/options')['default']().argv;
 
 describe('invalidate', () => {
 

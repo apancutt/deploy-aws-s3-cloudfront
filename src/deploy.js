@@ -49,7 +49,7 @@ const softDelete = (logger, s3, objects, options) => Promise.all(objects.map((ob
     Tagging: {
       TagSet: Object.entries({
         ...object.tagSet,
-        [options.softDeleteLifecycleTagKey]: options.softDeleteLifecycleTagValue,
+        [options.softDeleteTagKey]: options.softDeleteTagValue,
       }).map(([ key, value ]) => ({ Key: key, Value: value })),
     },
   }).promise();
