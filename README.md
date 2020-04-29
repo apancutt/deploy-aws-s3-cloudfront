@@ -19,7 +19,7 @@ If you are relying on credentials stored in `~/.aws/credentials` you can use `AW
 
 ### Options
 
-#### Global
+#### Global Options
 
 ##### `--bucket <name>` (required)
 
@@ -47,7 +47,7 @@ Accepted formats are: `colorized`, `json` or `text`.
 
 Default: `text`
 
-#### Options (`deploy-aws-s3-cloudfront`)
+#### deploy-aws-s3-cloudfront` Options
 
 ##### `--acl <pattern:value> [<pattern:value>...]`
 
@@ -149,27 +149,27 @@ See the [Using Patterns](#using-patterns) section for pattern usage.
 
 Default: `[]`
 
-#### Options (`deploy-aws-s3-cloudfront install-soft-delete`)
+#### `deploy-aws-s3-cloudfront install-soft-delete`  Options
 
-#### `--expiration <expiration>`
+##### `--expiration <expiration>`
 
 Expiration (in days) rule for generated soft-deletion lifecycle policy.
 
 Default: `90`
 
-#### `--id <ID>`
+##### `--id <ID>`
 
 ID for generated soft-deletion lifecycle policy.
 
 Default: `Soft-Delete`
 
-#### `--tag-key <key>`
+##### `--tag-key <key>`
 
 Key used for generated soft-deletion lifecycle policy tag.
 
 Default: `deleted`
 
-#### `--tag-value <value>`
+##### `--tag-value <value>`
 
 Value used for generated soft-deletion lifecycle policy tag.
 
