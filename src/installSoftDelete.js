@@ -41,7 +41,8 @@ module.exports = (logger, s3, options) => (
     .promise()
     .then((config) => {
       if (config.Rules.find((rule) => options.id === rule.ID)) {
-        return Promise.reject(new Error(`Lifecycle rule ${options.id} already exists`));
+        logger.info(`Soft-delete lifecycle rule already exists on s3://${options.bucket} named "${options.id}"`);
+        return options.id;
       }
       return createLifecycle(logger, s3, options, config);
     })

@@ -39,7 +39,7 @@ Promise.resolve(((command, options) => {
         .then(({ added, deleted, invalidated, modified }) => summarize(logger, added, modified, deleted, invalidated, options))
 
   }
-}) (options._, options)).catch(({ message, ...rest }) => {
+}) (options._.shift(), options)).catch(({ message, ...rest }) => {
   logger.error(message, rest);
   process.exitCode = 1;
 });
