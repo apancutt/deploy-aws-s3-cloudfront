@@ -121,7 +121,7 @@ Default: `false`
 
 ##### `--soft-delete-tag-key <key>`
 
-Key used for generated soft-deletion lifecycle policy tag.
+Soft-deleted objects are tagged with this key.
 
 See the [Soft-Deleting Objects](#soft-deleting-objects) section for more information.
 
@@ -129,7 +129,7 @@ Default: `deleted`
 
 ##### `--soft-delete-tag-value <value>`
 
-Value used for generated soft-deletion lifecycle policy tag.
+Soft-deleted objects are tagged with this value.
 
 See the [Soft-Deleting Objects](#soft-deleting-objects) section for more information.
 
@@ -141,7 +141,7 @@ Path to local directory to sync from.
 
 Default: `.`
 
-##### `--tags <pattern>:<tag1key>=<tag1value>[,<tag2key>=<tag2value>...] [<pattern>:<tag1key>=<tag1value>[,<tag2key>=<tag2value>...]...]`
+##### `--tags <pattern>:<key>=<value>[,<key>=<value>...] [<pattern>:<key>=<value>[,<key>=<value>...]...]`
 
 Apply tags to specific pattern(s). All patterns that match the path are applied.
 
