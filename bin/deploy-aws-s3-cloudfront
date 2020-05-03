@@ -10,15 +10,17 @@ const options = require('../src/options').argv;
 
 const changeset = require('../src/changeset');
 const cloudFront = require('../src/cloudFront')();
+const createLogger = require('../src/createLogger');
 const deploy = require('../src/deploy');
 const deployConfirmation = require('../src/deployConfirmation');
 const invalidate = require('../src/invalidate');
 const invalidateConfirmation = require('../src/invalidateConfirmation');
-const logger = require('../src/logger')(options);
 const s3 = require('../src/s3')();
 const installSoftDelete = require('../src/installSoftDelete');
 const stale = require('../src/stale');
 const summarize = require('../src/summarize');
+
+const logger = createLogger(options.outputFormat, options.debug);
 
 Promise.resolve(((command, options) => {
   switch (command) {

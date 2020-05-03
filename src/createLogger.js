@@ -1,6 +1,6 @@
 const winston = require('winston');
 
-const formatters = (format) => {
+const formatters = (format, debug) => {
 
   const collection = [ winston.format.timestamp() ];
 
@@ -18,7 +18,7 @@ const formatters = (format) => {
 
   collection.push(winston.format.printf(({ level, message, timestamp, ...rest }) => {
 
-      rest = JSON.stringify('debug' === level ? rest : {});
+      rest = JSON.stringify(debug ? rest : {});
 
       let output = `[${timestamp}] ${level}: ${message}`;
 
@@ -34,9 +34,9 @@ const formatters = (format) => {
 
 };
 
-module.exports = (options) => winston.createLogger({
+module.exports = (format, debug = false) => winston.createLogger({
   transports: [ new winston.transports.Console({
-    format: formatters(options.outputFormat),
-    level: options.debug ? 'debug' : 'info',
+    format: formatters(format, debug),
+    level: debug ? 'debug' : 'info',
   }) ],
 });
