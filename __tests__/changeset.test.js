@@ -53,6 +53,16 @@ describe('changeset', () => {
 
   });
 
+  test('it ignores deleted (hard-delete + retain)', async () => {
+
+    expect.assertions(1);
+
+    return changeset(mockLogger, mockS3, { ...options, delete: true, retain: ["*remote*"] }).then(({ deleted }) => {
+      expect(deleted).toEqual([]);
+    });
+
+  });
+
   test('it includes deleted (hard-delete)', async () => {
 
     expect.assertions(1);
