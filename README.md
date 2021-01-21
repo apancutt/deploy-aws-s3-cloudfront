@@ -113,7 +113,7 @@ Default: `false`
 
 ##### `--retain <pattern> [<pattern>...]`
 
-Pattern(s) to skip from deletion. Used with `--delete`
+Pattern(s) to skip from deletion. Used with the [`delete`](#delete) option.
 
 See the [Using Patterns](#using-patterns) section for pattern usage.
 
