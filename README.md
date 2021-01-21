@@ -69,7 +69,7 @@ Default: `[]`
 
 ##### `--delete`
 
-Delete objects in AWS S3 that do not exist locally. Objects are retained if both this option and [`soft-delete`](#soft-delete) are omitted.
+Delete objects in AWS S3 that do not exist locally. Objects are retained if both this option and [`soft-delete`](#--soft-delete) are omitted.
 
 Default: `false`
 
@@ -113,7 +113,7 @@ Default: `false`
 
 ##### `--retain <pattern> [<pattern>...]`
 
-Pattern(s) to skip from deletion. Used with the [`delete`](#delete) option.
+Pattern(s) to skip from deletion. Used with the [`delete`](#--delete) option.
 
 See the [Using Patterns](#using-patterns) section for pattern usage.
 
@@ -121,7 +121,7 @@ Default: `[]`
 
 ##### `--soft-delete`
 
-Tag objects in AWS S3 that do not exist locally. Objects are retained if both this option and [`delete`](#delete) are omitted.
+Tag objects in AWS S3 that do not exist locally. Objects are retained if both this option and [`delete`](#--delete) are omitted.
 
 See the [Soft-Deleting Objects](#soft-deleting-objects) section for more information.
 
