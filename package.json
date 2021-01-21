@@ -1,6 +1,6 @@
 {
   "name": "deploy-aws-s3-cloudfront",
-  "version": "3.2.4",
+  "version": "3.3.0",
   "description": "Syncs a local directory to an AWS S3 bucket, optionally invalidating affected CloudFront paths.",
   "keywords": [
     "aws",
@@ -18,7 +18,9 @@
     "type": "git",
     "url": "git+https://github.com/apancutt/deploy-aws-s3-cloudfront.git"
   },
-  "bin": "./bin/deploy-aws-s3-cloudfront",
+  "bin": {
+    "deploy-aws-s3-cloudfront": "bin/deploy-aws-s3-cloudfront"
+  },
   "files": [
     "bin",
     "src"
