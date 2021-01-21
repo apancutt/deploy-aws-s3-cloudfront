@@ -31,12 +31,12 @@
     "mime-types": "2",
     "prompt-confirm": "2",
     "winston": "3",
-    "yargs": "15"
+    "yargs": "16"
   },
   "devDependencies": {
     "babel-eslint": "10",
-    "eslint": "6",
-    "jest": "25"
+    "eslint": "7",
+    "jest": "26"
   },
   "scripts": {
     "eslint": "eslint */**/*.js",
