@@ -56,6 +56,12 @@ module.exports = yargs
         describe: 'Delete objects in AWS S3 that do not exist locally. Objects are retained if both this option and soft-delete are omitted.',
         type: 'boolean',
       })
+      .option('retain', {
+        default: [],
+        describe: 'Pattern(s) to skip from deletion.',
+        requiresArg: true,
+        type: 'array',
+      })
       .option('destination', {
         coerce: (arg) => {
           if (!arg.startsWith('/')) {

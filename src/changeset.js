@@ -154,7 +154,11 @@ module.exports = (logger, s3, options) => Promise.all([
           added.push(info(name, false, options));
         } else if (!existence.locally) {
           if (options.delete || options.softDelete) {
-            deleted.push(info(name, true, options));
+            if (!micromatch.isMatch(name, options.retain)) {
+              deleted.push(info(name, true, options));
+            } else {
+              logger.debug(`${name} retained on remote`);
+            }
           }
         } else if (differ(logger, name, md5File.sync(options.source + name), remoteNamesAndChecksums[name])) {
           modified.push(info(name, false, options))
