@@ -73,14 +73,6 @@ Delete objects in AWS S3 that do not exist locally. Objects are retained if both
 
 Default: `false`
 
-##### `--retain <pattern> [<pattern>...]`
-
-Pattern(s) to skip from deletion. Used with `--delete`
-
-See the [Using Patterns](#using-patterns) section for pattern usage.
-
-Default: `[]`
-
 ##### `--destination <path>`
 
 Path to remote directory to sync to.
@@ -118,6 +110,14 @@ Use recommended settings for React applications.
 See the [React Apps](#react-apps) section for more information.
 
 Default: `false`
+
+##### `--retain <pattern> [<pattern>...]`
+
+Pattern(s) to skip from deletion. Used with `--delete`
+
+See the [Using Patterns](#using-patterns) section for pattern usage.
+
+Default: `[]`
 
 ##### `--soft-delete`
 
