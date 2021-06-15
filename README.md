@@ -12,6 +12,50 @@ This packages uses the [AWS SDK for Node.js](https://aws.amazon.com/sdk-for-node
 
 If you are relying on credentials stored in `~/.aws/credentials` you can use `AWS_PROFILE=<profile> deploy-aws-s3-cloudfront ...` to use a custom-named profile.
 
+<details>
+  <summary>Example IAM policy you can use to interact with AWS API.</summary>
+  
+  Please replace `<BUCKET_NAME>`, `<ACCOUNT_ID>`, `<DISTRIBUTION_ID>` values with those of your own.
+  
+  ```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "ListBuckets",
+            "Effect": "Allow",
+            "Action": "s3:ListAllMyBuckets",
+            "Resource": "*"
+        },
+        {
+            "Sid": "ListBucket",
+            "Effect": "Allow",
+            "Action": "s3:ListBucket",
+            "Resource": "arn:aws:s3:::<BUCKET_NAME>"
+        },
+        {
+            "Sid": "OperateWithObjects",
+            "Effect": "Allow",
+            "Action": [
+                "s3:PutObject",
+                "s3:PutObjectAcl",
+                "s3:PutObjectVersionAcl",
+                "s3:DeleteObject",
+                "s3:DeleteObjectVersion"
+            ],
+            "Resource": "arn:aws:s3:::<BUCKET_NAME>/*"
+        },
+        {
+            "Sid": "CloudFrontInvalidation",
+            "Effect": "Allow",
+            "Action": "cloudfront:CreateInvalidation",
+            "Resource": "arn:aws:cloudfront::<ACCOUNT_ID>:distribution/<DISTRIBUTION_ID>"
+        }
+    ]
+}
+  ```
+</details>
+
 ## Usage
 
     deploy-aws-s3-cloudfront --bucket <bucket> [options]
