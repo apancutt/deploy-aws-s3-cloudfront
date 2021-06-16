@@ -12,50 +12,6 @@ This packages uses the [AWS SDK for Node.js](https://aws.amazon.com/sdk-for-node
 
 If you are relying on credentials stored in `~/.aws/credentials` you can use `AWS_PROFILE=<profile> deploy-aws-s3-cloudfront ...` to use a custom-named profile.
 
-<details>
-  <summary>Example IAM policy you can use to interact with AWS API.</summary>
-  
-  Please replace `<BUCKET_NAME>`, `<ACCOUNT_ID>`, `<DISTRIBUTION_ID>` values with those of your own.
-  
-  ```json
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "ListBuckets",
-            "Effect": "Allow",
-            "Action": "s3:ListAllMyBuckets",
-            "Resource": "*"
-        },
-        {
-            "Sid": "ListBucket",
-            "Effect": "Allow",
-            "Action": "s3:ListBucket",
-            "Resource": "arn:aws:s3:::<BUCKET_NAME>"
-        },
-        {
-            "Sid": "OperateWithObjects",
-            "Effect": "Allow",
-            "Action": [
-                "s3:PutObject",
-                "s3:PutObjectAcl",
-                "s3:PutObjectVersionAcl",
-                "s3:DeleteObject",
-                "s3:DeleteObjectVersion"
-            ],
-            "Resource": "arn:aws:s3:::<BUCKET_NAME>/*"
-        },
-        {
-            "Sid": "CloudFrontInvalidation",
-            "Effect": "Allow",
-            "Action": "cloudfront:CreateInvalidation",
-            "Resource": "arn:aws:cloudfront::<ACCOUNT_ID>:distribution/<DISTRIBUTION_ID>"
-        }
-    ]
-}
-  ```
-</details>
-
 ## Usage
 
     deploy-aws-s3-cloudfront --bucket <bucket> [options]
@@ -286,6 +242,50 @@ In this example, the expiration is set to 90 days and the object was tagged for 
 Use the `--react` option when deploying apps created using `create-react-app`. This is shortcut for `deploy-aws-s3-cloudfront --source ./build/ --cache-control index.html:no-cache`.
 
 If you opt to delete objects on deployment, it is recommended to use the `--soft-delete` option to minimise impact to users online during a deployment. Such users will have loaded the previous version of `index.html` which will likely reference assets which have since been deleted by a deployment. They will not receive the latest `index.html` until they refresh. Using the `--soft-delete` option will retain stale objects in S3 for a period of time to allow online users to continue browsing until they refresh to get the latest version.
+
+## Example IAM Policy
+
+The example below should allow you to use the core functionality of this tool. Advanced usage (such as soft-deletion) may require further permissions (TODO).
+  
+Please replace `<BUCKET_NAME>`, `<ACCOUNT_ID>`, `<DISTRIBUTION_ID>` values with those of your own.
+  
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "ListBuckets",
+            "Effect": "Allow",
+            "Action": "s3:ListAllMyBuckets",
+            "Resource": "*"
+        },
+        {
+            "Sid": "ListBucket",
+            "Effect": "Allow",
+            "Action": "s3:ListBucket",
+            "Resource": "arn:aws:s3:::<BUCKET_NAME>"
+        },
+        {
+            "Sid": "OperateWithObjects",
+            "Effect": "Allow",
+            "Action": [
+                "s3:PutObject",
+                "s3:PutObjectAcl",
+                "s3:PutObjectVersionAcl",
+                "s3:DeleteObject",
+                "s3:DeleteObjectVersion"
+            ],
+            "Resource": "arn:aws:s3:::<BUCKET_NAME>/*"
+        },
+        {
+            "Sid": "CloudFrontInvalidation",
+            "Effect": "Allow",
+            "Action": "cloudfront:CreateInvalidation",
+            "Resource": "arn:aws:cloudfront::<ACCOUNT_ID>:distribution/<DISTRIBUTION_ID>"
+        }
+    ]
+}
+```
 
 ## Alternatives
 
