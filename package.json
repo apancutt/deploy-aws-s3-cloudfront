@@ -38,7 +38,7 @@
   "devDependencies": {
     "babel-eslint": "10",
     "eslint": "7",
-    "jest": "26"
+    "jest": "27"
   },
   "scripts": {
     "eslint": "eslint */**/*.js",
