@@ -4,6 +4,14 @@ const yargs = require('yargs');
 
 yargs.parserConfiguration({ 'strip-dashed': true });
 
+const ensureArray = (value) => (
+  Array.isArray(value)
+    ? value
+    : undefined === value || null === value
+      ? []
+      : [ value ]
+);
+
 module.exports = yargs
   .usage('$0 --bucket <bucket> | $0 install-soft-delete --bucket <bucket> [options]')
   .option('bucket', {
@@ -32,7 +40,7 @@ module.exports = yargs
   .command('$0', 'Syncs a local directory to an AWS S3 bucket, optionally invalidating affected CloudFront paths.', (yargs) => (
     yargs
       .option('acl', {
-        coerce: (arg) => arg.reduce((previous, current) => {
+        coerce: (arg) => ensureArray(arg).reduce((previous, current) => {
           const [ pattern, value ] = current.split(':', 2);
           return { ...previous, [pattern]: value };
         }, {}),
@@ -42,7 +50,7 @@ module.exports = yargs
         type: 'array',
       })
       .option('cache-control', {
-        coerce: (arg) => arg.reduce((previous, current) => {
+        coerce: (arg) => ensureArray(arg).reduce((previous, current) => {
           const [ pattern, value ] = current.split(':', 2);
           return { ...previous, [pattern]: value };
         }, {}),
@@ -132,7 +140,7 @@ module.exports = yargs
         type: 'string',
       })
       .option('tags', {
-        coerce: (arg) => arg.reduce((previous, current) => {
+        coerce: (arg) => ensureArray(arg).reduce((previous, current) => {
           const [ pattern, tags ] = current.split(':', 2);
           return {
             ...previous,

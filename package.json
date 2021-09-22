@@ -33,7 +33,7 @@
     "mime-types": "2",
     "prompt-confirm": "2",
     "winston": "3",
-    "yargs": "16"
+    "yargs": "17"
   },
   "devDependencies": {
     "babel-eslint": "10",
