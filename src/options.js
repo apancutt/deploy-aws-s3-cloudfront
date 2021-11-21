@@ -25,12 +25,12 @@ module.exports = yargs
     describe: 'Enable output of debugging log messages.',
     type: 'boolean',
   })
-  .option('non-interactive', {
+  .option('nonInteractive', {
     default: false,
     describe: 'Do not prompt for confirmations.',
     type: 'boolean',
   })
-  .option('output-format', {
+  .option('outputFormat', {
     choices: [ 'colorized', 'json', 'text' ],
     default: 'text',
     describe: 'Logging output format.',
@@ -49,11 +49,12 @@ module.exports = yargs
         requiresArg: true,
         type: 'array',
       })
-      .option('cache-control', {
-        coerce: (arg) => ensureArray(arg).reduce((previous, current) => {
+      .option('cacheControl', {
+        coerce: (arg) => (
+          ensureArray(arg).reduce((previous, current) => {
           const [ pattern, value ] = current.split(':', 2);
           return { ...previous, [pattern]: value };
-        }, {}),
+        }, {})),
         default: [],
         describe: 'Apply Cache Control to specific pattern(s). The first pattern to match the path is applied.',
         requiresArg: true,
@@ -96,7 +97,7 @@ module.exports = yargs
         requiresArg: true,
         type: 'array',
       })
-      .option('invalidation-path', {
+      .option('invalidationPath', {
         default: [],
         describe: 'Set the invalidation path(s) instead of automatically detecting objects to invalidate. Paths should be absolute (with a leading slash).',
         requiresArg: true,
@@ -107,18 +108,18 @@ module.exports = yargs
         describe: 'Use recommended settings for React applications.',
         type: 'boolean',
       })
-      .option('soft-delete', {
+      .option('softDelete', {
         default: false,
         describe: 'Tag objects in AWS S3 that do not exist locally. Objects are retained if both this option and delete are omitted.',
         type: 'boolean',
       })
-      .option('soft-delete-tag-key', {
+      .option('softDeleteTagKey', {
         default: 'deleted',
         describe: 'Key used for generated soft-deletion lifecycle policy tag.',
         requiresArg: true,
         type: 'string',
       })
-      .option('soft-delete-tag-value', {
+      .option('softDeleteTagValue', {
         default: 'true',
         describe: 'Value used for generated soft-deletion lifecycle policy tag.',
         requiresArg: true,
@@ -192,13 +193,13 @@ module.exports = yargs
         requiresArg: true,
         type: 'string',
       })
-      .option('tag-key', {
+      .option('tagKey', {
         default: 'deleted',
         describe: 'Key used for generated soft-deletion lifecycle policy tag.',
         requiresArg: true,
         type: 'string',
       })
-      .option('tag-value', {
+      .option('tagValue', {
         default: 'true',
         describe: 'Value used for generated soft-deletion lifecycle policy tag.',
         requiresArg: true,
