@@ -1,4 +1,4 @@
-const PromptConfirm = require('prompt-confirm');
+const { Confirm } = require('enquirer');
 
 module.exports = (logger, added, modified, deleted, options) => {
 
@@ -16,7 +16,7 @@ module.exports = (logger, added, modified, deleted, options) => {
 
   return Promise.resolve(
     (!options.nonInteractive && (added.length || modified.length || deleted.length))
-      ? (new PromptConfirm('Proceed with deployment?')).run()
+      ? new Confirm({ message: 'Proceed with deployment?' }).run()
       : true
   )
     .then((confirmed) => confirmed ? { added, deleted, modified } : Promise.reject(new Error('Deployment was aborted by the user')));

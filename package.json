@@ -27,11 +27,11 @@
   ],
   "dependencies": {
     "aws-sdk": "2",
+    "enquirer": "2",
     "fast-glob": "3",
     "md5-file": "5",
     "micromatch": "4",
     "mime-types": "2",
-    "prompt-confirm": "2",
     "winston": "3",
     "yargs": "17"
   },

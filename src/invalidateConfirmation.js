@@ -1,4 +1,4 @@
-const PromptConfirm = require('prompt-confirm');
+const { Confirm } = require('enquirer');
 
 module.exports = (logger, paths, options) => {
 
@@ -8,7 +8,7 @@ module.exports = (logger, paths, options) => {
 
   return Promise.resolve(
     (!options.nonInteractive && paths.length)
-      ? (new PromptConfirm('Proceed with invalidation?')).run()
+      ? new Confirm({ message: 'Proceed with invalidation?' }).run()
       : true
   ).then((confirmed) => confirmed ? paths : []);
 
