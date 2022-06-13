@@ -142,6 +142,7 @@ module.exports = (logger, s3, options) => Promise.all([
     const added = [];
     const modified = [];
     const deleted = [];
+    const unchanged = [];
 
     localNames
       .concat(Object.keys(remoteNamesAndChecksums))
@@ -162,10 +163,12 @@ module.exports = (logger, s3, options) => Promise.all([
           }
         } else if (differ(logger, name, md5File.sync(options.source + name), remoteNamesAndChecksums[name])) {
           modified.push(info(name, false, options))
+        } else {
+          unchanged.push(info(name, false, options));
         }
 
       });
 
-    return { added, deleted, modified };
+    return { added, deleted, modified, unchanged };
 
   });
