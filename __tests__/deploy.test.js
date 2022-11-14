@@ -50,6 +50,8 @@ describe('deploy', () => {
     tagSet: {},
   }];
 
+  const unchanged = [];
+
   beforeAll(() => {
     mockLogger = new Logger();
     mockS3 = new S3();
@@ -59,7 +61,7 @@ describe('deploy', () => {
 
     expect.assertions(7);
 
-    return deploy(mockLogger, mockS3, added, modified, deleted, options).then((resolution) => {
+    return deploy(mockLogger, mockS3, added, modified, deleted, unchanged, options).then((resolution) => {
 
       expect(mockS3.lastUploadParams.Key).toEqual(modified[0].path.s3);
 
@@ -79,7 +81,7 @@ describe('deploy', () => {
 
     expect.assertions(1);
 
-    return deploy(mockLogger, mockS3, added, modified, deleted, { ...options, softDelete: true }).then(() => {
+    return deploy(mockLogger, mockS3, added, modified, deleted, unchanged, { ...options, softDelete: true }).then(() => {
 
       expect(mockS3.lastPutObjectTaggingParams.Key).toEqual(deleted[0].path.s3);
 

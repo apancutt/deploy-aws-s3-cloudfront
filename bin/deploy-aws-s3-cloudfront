@@ -30,8 +30,8 @@ Promise.resolve(((command, options) => {
 
     default:
       return changeset(logger, s3, options)
-        .then(({ added, deleted, modified }) => deployConfirmation(logger, added, modified, deleted, options))
-        .then(({ added, deleted, modified }) => deploy(logger, s3, added, modified, deleted, options))
+        .then(({ added, deleted, modified, unchanged }) => deployConfirmation(logger, added, modified, deleted, unchanged, options))
+        .then(({ added, deleted, modified, unchanged }) => deploy(logger, s3, added, modified, deleted, unchanged, options))
         .then(({ added, deleted, modified }) => (
           stale(modified, deleted, options)
             .then((stale) => invalidateConfirmation(logger, stale, options))
