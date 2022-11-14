@@ -8,26 +8,21 @@ describe('invalidate', () => {
   let mockCloudFront;
   let mockLogger;
 
-  beforeAll(() => {
+  beforeEach(() => {
     mockLogger = new Logger();
     mockCloudFront = new CloudFront();
   });
 
   test('it sends the correct params and resolves with invalidated paths', async () => {
 
-    expect.assertions(5);
-
     const paths = [ '/foo.txt' ];
 
-    return invalidate(mockLogger, mockCloudFront, paths, options).then((resolution) => {
-
-      expect(mockCloudFront.lastCreateInvalidationParams.DistributionId).toEqual(options.distribution);
-      expect(typeof mockCloudFront.lastCreateInvalidationParams.InvalidationBatch.CallerReference).toEqual('string');
-      expect(mockCloudFront.lastCreateInvalidationParams.InvalidationBatch.Paths.Items).toEqual(resolution);
-      expect(mockCloudFront.lastCreateInvalidationParams.InvalidationBatch.Paths.Quantity).toEqual(resolution.length);
-      expect(resolution).toEqual(paths);
-
-    });
+    const resolution = await invalidate(mockLogger, mockCloudFront, paths, options);
+    expect(mockCloudFront.lastCreateInvalidationParams.DistributionId).toBe(options.distribution);
+    expect(typeof mockCloudFront.lastCreateInvalidationParams.InvalidationBatch.CallerReference).toBe('string');
+    expect(mockCloudFront.lastCreateInvalidationParams.InvalidationBatch.Paths.Quantity).toBe(resolution.length);
+    expect(mockCloudFront.lastCreateInvalidationParams.InvalidationBatch.Paths.Items).toEqual(resolution);
+    expect(resolution).toEqual(paths);
 
   });
 

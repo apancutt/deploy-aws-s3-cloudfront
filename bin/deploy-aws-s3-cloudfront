@@ -30,15 +30,15 @@ Promise.resolve(((command, options) => {
 
     default:
       return changeset(logger, s3, options)
-        .then(({ added, deleted, modified, unchanged }) => deployConfirmation(logger, added, modified, deleted, unchanged, options))
-        .then(({ added, deleted, modified, unchanged }) => deploy(logger, s3, added, modified, deleted, unchanged, options))
-        .then(({ added, deleted, modified }) => (
+        .then(({ added, deleted, modified, unmodified }) => deployConfirmation(logger, added, modified, unmodified, deleted, options))
+        .then(({ added, deleted, modified, unmodified }) => deploy(logger, s3, added, modified, unmodified, deleted, options))
+        .then(({ added, deleted, modified, unmodified }) => (
           stale(modified, deleted, options)
             .then((stale) => invalidateConfirmation(logger, stale, options))
             .then((stale) => invalidate(logger, cloudFront, stale, options))
-            .then((invalidated) => ({ added, deleted, invalidated, modified }))
+            .then((invalidated) => ({ added, deleted, invalidated, modified, unmodified }))
         ))
-        .then(({ added, deleted, invalidated, modified }) => summarize(logger, added, modified, deleted, invalidated, options))
+        .then(({ added, deleted, invalidated, modified, unmodified }) => summarize(logger, added, modified, unmodified, deleted, invalidated, options))
 
   }
 }) (options._.shift(), options)).catch(({ message, ...rest }) => {

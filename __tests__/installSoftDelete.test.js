@@ -8,21 +8,18 @@ describe('installSoftDelete', () => {
   let mockS3;
   let mockLogger;
 
-  beforeAll(() => {
+  beforeEach(() => {
     mockLogger = new Logger();
     mockS3 = new S3();
   });
 
   test('it sends the correct params and resolves with the ID', async () => {
 
-    expect.assertions(2);
+    const resolution = await installSoftDelete(mockLogger, mockS3, options);
 
-    return installSoftDelete(mockLogger, mockS3, options).then((resolution) => {
-
-      expect(mockS3.lastPutBucketLifecycleConfigurationParams.LifecycleConfiguration.Rules[0].ID).toEqual(resolution);
-      expect(options.id).toEqual(resolution);
-
-    });
+    expect(mockS3.putBucketLifecycleConfigurationParams.length).toBe(1);
+    expect(mockS3.putBucketLifecycleConfigurationParams[0].LifecycleConfiguration.Rules[0].ID).toBe(resolution);
+    expect(options.id).toBe(resolution);
 
   });
 

@@ -41,7 +41,7 @@ const hardDelete = (logger, s3, objects, options) => Promise.all(
 
 const removeSoftDelete = (logger, s3, objects, options) => Promise.all(objects.map((object) => {
 
-  logger.debug(`Removing soft-delete to ${objects.length} objects...`, { objects });
+  logger.debug(`Removing soft-delete from ${objects.length} objects...`, { objects });
 
   return s3.putObjectTagging({
     Bucket: options.bucket,
@@ -72,11 +72,11 @@ const softDelete = (logger, s3, objects, options) => Promise.all(objects.map((ob
 
 }));
 
-module.exports = (logger, s3, added, modified, deleted, unchanged, options) => (
+module.exports = (logger, s3, added, modified, unmodified, deleted, options) => (
   Promise.all([
     upload(logger, s3, added.concat(modified), options),
-    options.softDelete ? removeSoftDelete(logger, s3, modified.concat(unchanged), options) : Promise.resolve(true),
+    options.softDelete && removeSoftDelete(logger, s3, modified.concat(unmodified), options),
     options.softDelete ? softDelete(logger, s3, deleted, options) : hardDelete(logger, s3, deleted, options),
   ])
-    .then(() => ({ added, modified, deleted, unchanged }))
+    .then(() => ({ added, deleted, modified, unmodified }))
 );

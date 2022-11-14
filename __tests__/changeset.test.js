@@ -8,107 +8,109 @@ describe('changeset', () => {
   let mockLogger;
   let mockS3;
 
-  beforeAll(() => {
+  beforeEach(() => {
     mockLogger = new Logger();
     mockS3 = new S3();
   });
 
   test('it ignores deleted', async () => {
 
-    expect.assertions(3);
+    const { added, deleted, modified, unmodified } = await changeset(mockLogger, mockS3, options);
 
-    return changeset(mockLogger, mockS3, options).then(({ added, deleted, modified }) => {
-
-      expect(added).toEqual([{
-        acl: undefined,
-        cacheControl: undefined,
-        contentLength: 21,
-        contentType: 'text/plain',
-        path: {
-          cloudFront: '/test/local.txt',
-          local: `${options.source}local.txt`,
-          relative: 'local.txt',
-          s3: 'test/local.txt',
-        },
-        tagSet: {},
-      }]);
-
-      expect(modified).toEqual([{
-        acl: undefined,
-        cacheControl: undefined,
-        contentLength: 24,
-        contentType: 'text/plain',
-        path: {
-          cloudFront: '/test/modified.txt',
-          local: `${options.source}modified.txt`,
-          relative: 'modified.txt',
-          s3: 'test/modified.txt',
-        },
-        tagSet: {},
-      }]);
-
-      expect(deleted).toEqual([]);
-
+    expect(added.length).toBe(1);
+    expect(added[0]).toEqual({
+      acl: undefined,
+      cacheControl: undefined,
+      contentLength: 21,
+      contentType: 'text/plain',
+      path: {
+        cloudFront: '/test/local.txt',
+        local: `${options.source}local.txt`,
+        relative: 'local.txt',
+        s3: 'test/local.txt',
+      },
+      tagSet: {},
     });
+
+    expect(modified.length).toBe(1);
+    expect(modified[0]).toEqual({
+      acl: undefined,
+      cacheControl: undefined,
+      contentLength: 24,
+      contentType: 'text/plain',
+      path: {
+        cloudFront: '/test/modified.txt',
+        local: `${options.source}modified.txt`,
+        relative: 'modified.txt',
+        s3: 'test/modified.txt',
+      },
+      tagSet: {},
+    });
+
+    expect(unmodified.length).toBe(1);
+    expect(unmodified[0]).toEqual({
+      acl: undefined,
+      cacheControl: undefined,
+      contentLength: 27,
+      contentType: 'text/plain',
+      path: {
+        cloudFront: '/test/unmodified.txt',
+        local: `${options.source}unmodified.txt`,
+        relative: 'unmodified.txt',
+        s3: 'test/unmodified.txt',
+      },
+      tagSet: {},
+    });
+
+    expect(deleted.length).toBe(0);
 
   });
 
   test('it ignores deleted (hard-delete + retain)', async () => {
 
-    expect.assertions(1);
-
-    return changeset(mockLogger, mockS3, { ...options, delete: true, retain: ["*remote*"] }).then(({ deleted }) => {
-      expect(deleted).toEqual([]);
-    });
+    const { deleted } = await changeset(mockLogger, mockS3, { ...options, delete: true, retain: [ '*remote*' ] });
+    expect(deleted.length).toBe(0);
 
   });
 
   test('it includes deleted (hard-delete)', async () => {
 
-    expect.assertions(1);
+    const { deleted } = await changeset(mockLogger, mockS3, { ...options, delete: true });
 
-    return changeset(mockLogger, mockS3, { ...options, delete: true }).then(({ deleted }) => {
-
-      expect(deleted).toEqual([{
-        acl: undefined,
-        cacheControl: undefined,
-        contentLength: undefined,
-        contentType: undefined,
-        path: {
-          cloudFront: '/test/remote.txt',
-          local: `${options.source}remote.txt`,
-          relative: 'remote.txt',
-          s3: 'test/remote.txt',
-        },
-        tagSet: {},
-      }]);
-
-
+    expect(deleted.length).toBe(1);
+    expect(deleted[0]).toEqual({
+      acl: undefined,
+      cacheControl: undefined,
+      contentLength: undefined,
+      contentType: undefined,
+      path: {
+        cloudFront: '/test/remote.txt',
+        local: `${options.source}remote.txt`,
+        relative: 'remote.txt',
+        s3: 'test/remote.txt',
+      },
+      tagSet: {},
     });
 
   });
 
   test('it includes deleted (soft-delete)', async () => {
 
-    expect.assertions(1);
+    const { deleted } = await changeset(mockLogger, mockS3, { ...options, softDelete: true });
 
-    return changeset(mockLogger, mockS3, { ...options, softDelete: true }).then(({ deleted }) => {
-
-      expect(deleted).toEqual([{
-        acl: undefined,
-        cacheControl: undefined,
-        contentLength: undefined,
-        contentType: undefined,
-        path: {
-          cloudFront: '/test/remote.txt',
-          local: `${options.source}remote.txt`,
-          relative: 'remote.txt',
-          s3: 'test/remote.txt',
-        },
-        tagSet: {},
-      }]);
-
-
+    expect(deleted.length).toBe(1);
+    expect(deleted[0]).toEqual({
+      acl: undefined,
+      cacheControl: undefined,
+      contentLength: undefined,
+      contentType: undefined,
+      path: {
+        cloudFront: '/test/remote.txt',
+        local: `${options.source}remote.txt`,
+        relative: 'remote.txt',
+        s3: 'test/remote.txt',
+      },
+      tagSet: {},
     });
 
   });
